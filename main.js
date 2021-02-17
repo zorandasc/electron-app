@@ -65,7 +65,7 @@ ipcMain.handle('connect', (event, ...args) => {
         })    
     }, 2000)
   });
-//ovo je bitno ako je ogrsna ip adrsesa
+//ovo je bitno ako je pogrsna ip adrsesa
   if(client.connecting){
     console.log(client.connecting)
     win.webContents.send('connect-result', "Conecting....")

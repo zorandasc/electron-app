@@ -60,28 +60,28 @@
             //chart.stop();
 
             function connect(){
+                //posalji signal mainu za connect to host
                 ipcRenderer.invoke('connect')
                
             }
-
+            //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
-               document.getElementById("ta").innerHTML= arg
-               ;
-                   
+               document.getElementById("ta").innerHTML= arg;                
             })
 
             function disConnect() {
-                ipcRenderer.invoke('disconnect')
-               
-                
+                //posalji signal mainu za diskonect from host
+                ipcRenderer.invoke('disconnect') 
             }
 
 
             function startGraf(){
-                ipcRenderer.invoke('startGraf')
-               
+                //posalji signal mainu da zapocne intervanu petlju ocitanja
+                //vrijednosti i vracanja natrag dole
+                ipcRenderer.invoke('startGraf')   
             }
 
+            //rezultati dobijeni od maina unutar koje imaintervalna petlja
             ipcRenderer.on('resultVal', function (event, arg) {
                 result = Number(arg);
                 series.append(Date.now(), result);
