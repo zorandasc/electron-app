@@ -1,0 +1,120 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+<style>
+    div.smoothie-chart-tooltip {
+        background: #444;
+        padding: 1em;
+        margin-top: 20px;
+        font-family: consolas;
+        color: white;
+        font-size: 10px;
+        pointer-events: none;
+}
+</style>
+<body style="background: white;">
+    <h1>Hello World!</h1>
+    <p>
+        We are using node
+        <script>document.write(process.versions.node)</script>,
+        Chrome
+        <script>document.write(process.versions.chrome)</script>,
+        and Electron
+        <script>document.write(process.versions.electron)</script>.
+    </p>
+    <button onclick="connect()">Connect</button>
+    <button onclick="disConnect()">DisConnect</button>
+    <button onclick="startGraf()" >Start</button>
+    <button onclick="stopGraf()">Stop</button>
+    <canvas id="mycanvas" width="500" height="200"></canvas>
+    <script type="text/javascript" src="smoothie.js"></script>
+    <script>
+            var net = require('net');
+            var client = new net.Socket();
+
+            var dataInterval;
+            var oldDown = 0
+            var newDown = 0;
+            var result = 0;
+            var timeInterval = 4000;
+
+        // Create a time series
+            var series = new TimeSeries();
+
+            // Find the canvas
+            var canvas = document.getElementById("mycanvas");
+
+           
+            // Create the chart
+            var chart = new SmoothieChart({ 
+                labels: { fontSize: 15 },
+                tooltip: true, 
+                minValue: 0, 
+                timestampFormatter: SmoothieChart.timeFormatter,
+                maxValueScale: 1.2
+                
+            });
+
+            chart.addTimeSeries(series, { lineWidth: 3, strokeStyle: '#00ff00', fillStyle: 'rgba(0, 255, 0, 0.4)' });
+            chart.streamTo(canvas, 500);
+
+            //chart.start();
+            //chart.stop();
+
+            function connect(){
+                client.connect(23, '192.168.100.1', function () {
+                    console.log('Connected');
+                    client.write('root\r\n');
+                    setTimeout(() => {
+                        client.write('admin\r\n');
+                    }, 2000)
+                    
+                });
+            }
+
+            function disConnect() {
+                stopGraf()
+                client.destroy();
+            }
+
+            function startGraf(){
+               dataInterval=setInterval(function () {
+                    client.write('display portstatistics portnum 3\r\n');
+                    series.append(Date.now(), result);
+                }, timeInterval);
+            }
+
+            function stopGraf(){ 
+                clearInterval(dataInterval)
+            }
+
+            client.on('data', function (data) {
+                    
+                    var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
+                    if (trans) {
+                        newDown= Number(String(trans).match(/(\d+)/g))//Mbit
+
+                        result= (newDown- oldDown)/4;//BAJTA/s
+                        result = result * 8         //bits/s
+                        result = result / 1000      //kbits/s
+
+                        oldDown= newDown
+
+                        console.log("RESULTs kbit/s", result);
+                        
+                    }
+
+                    //console.log('Received: ' + data);
+                    //client.destroy(); // kill client after server's response
+            });
+            client.on('close', function() {
+	            console.log('Connection closed');
+            });
+    </script>
+</body>
+
+</html>
