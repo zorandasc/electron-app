@@ -37,7 +37,8 @@
             const { ipcRenderer } = require('electron')
 
         // Create a time series
-            var series = new TimeSeries();
+            var series1 = new TimeSeries();
+            var series2 = new TimeSeries();
 
             // Find the canvas
             var canvas = document.getElementById("mycanvas");
@@ -53,7 +54,9 @@
                 
             });
 
-            chart.addTimeSeries(series, { lineWidth: 3, strokeStyle: '#00ff00', fillStyle: 'rgba(0, 255, 0, 0.4)' });
+            chart.addTimeSeries(series1, { lineWidth: 3, strokeStyle: '#00ff00', fillStyle: 'rgba(0, 255, 0, 0.4)' });
+            chart.addTimeSeries(series2, { lineWidth: 3, strokeStyle: 'rgb(255, 0, 255)', fillStyle: 'rgba(255, 0, 255, 0.3)' });
+
             chart.streamTo(canvas, 500);
 
             //chart.start();
@@ -82,9 +85,15 @@
             }
 
             //rezultati dobijeni od maina unutar koje imaintervalna petlja
-            ipcRenderer.on('resultVal', function (event, arg) {
-                result = Number(arg);
-                series.append(Date.now(), result);
+            ipcRenderer.on('resultValDown', function (event, arg) {              
+                var resultDown = Number(arg);
+                series1.append(Date.now(), resultDown);
+            })
+
+            //rezultati dobijeni od maina unutar koje imaintervalna petlja
+            ipcRenderer.on('resultValUp', function (event, arg) {
+                var resultUp = Number(arg);
+                series2.append(Date.now(), resultUp);
             })
             
     </script>
