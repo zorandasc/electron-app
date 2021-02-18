@@ -9,8 +9,12 @@ var win;
 var dataInterval;
 var oldDown = 0
 var newDown = 0;
-var result = 0;
-var timeInterval = 4000;
+var resultDown = 0;
+var oldUp = 0
+var newUp = 0;
+var resultUp = 0;
+var timeInterval = 4;
+var firstReading=true
 
 function createWindow () {
   win = new BrowserWindow({
@@ -87,27 +91,46 @@ ipcMain.handle('disconnect', (event, ...args) => {
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle('startGraf', (event, ...args) => { 
+   firstReading=true 
    dataInterval=setInterval(function () {
-      client.write('display portstatistics portnum 3\r\n');    
-  }, timeInterval);
+      client.write('display portstatistics portnum 3\r\n');  
+  }, timeInterval*1000);
 })
 
+//Drugi mozda nacina hendlovanja firstreading je
+//mozda koristenje clent.emmit("prvikurec") event-a
+//a zatim hvatanja eventa sa client.on('prvikurec',()=>{})
 
 
+client.on('data', function (data) {  
+  //https://javascript.info/regexp-lookahead-lookbehind                 
+  //var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
+  var transm = data.toString().match(/(?<=tx_byte_ok \s\s+:\s)\d+/g)
+  //console.log("transm", transm)
+  //var receiv = data.toString().match(/(?<=rx_byte_ok \s\s+:\s)\d+/g)
+ // console.log("receiv",receiv)
+  
+  
 
-client.on('data', function (data) {                   
-  var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
-  if (trans) {
-      newDown= Number(String(trans).match(/(\d+)/g))//Mbit
-
-      result= (newDown- oldDown)/4;//BAJTA/s
-      result = result * 8         //bits/s
-      result = result / 1000      //kbits/s
-
-      oldDown= newDown
-
-      console.log("RESULTs kbit/s", result);
-      win.webContents.send('resultVal', result)
+  if (transm) {
+      //newDown= Number(String(trans).match(/(\d+)/g))
+      //[ '881213013905' ] Izvadi string i pretvoru u number
+      newDown=Number(transm[0]) 
+      
+      if(firstReading){
+        oldDown=newDown
+        oldUp=newUp
+        result=0
+        firstReading=false  
+       
+      }else{
+        resultDown= (newDown- oldDown)/timeInterval;//BAJTA/s
+        resultDown = resultDown * 8         //bits/s
+        resultDown = resultDown / 1000      //kbits/s
+        oldDown= newDown
+      }
+      console.log("RESULTs kbit/s", resultDown);
+      win.webContents.send('resultVal', resultDown)
   }
 });
 
@@ -124,3 +147,19 @@ client.on('timeout', () => {
 client.on('close', function() {
   console.log('Connection closed');
 });
+
+
+function calculateBitRate(newBajt, oldBajt){  
+      if(firstReading){
+        oldBajt=newBajt
+        result=0
+        firstReading=false  
+       
+      }else{
+        result= (newBajt- oldBajt)/timeInterval;//BAJTA/s
+        oldBajt= newBajt
+        result = result * 8         //bits/s
+        result = result / 1000      //kbits/s
+      }
+      return result
+}
