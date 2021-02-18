@@ -56,19 +56,16 @@ ipcMain.handle('connect', (event, ...args) => {
         
         //ocitaj samo jednom status tokom konektovanja
         client.once("data",(data)=>{
-          console.log(data)
+          
           var data=data.toString()
-          if(data.match(/WAP>/g)){
-            win.webContents.send('connect-result', "CONNECTED")
-          }else if(data.match(/User name or password is wrong/g)){
-            win.webContents.send('connect-result', "User name or password is wrong.")
-          }else{
-            win.webContents.send('connect-result', data)
-          }
-      
+
+          var status=checkConnectStatus(data)
+        
+          win.webContents.send('connect-result', status)
         })    
     }, 2000)
   });
+
 //ovo je bitno ako je pogrsna ip adrsesa
   if(client.connecting){
     console.log(client.connecting)
@@ -89,7 +86,7 @@ ipcMain.handle('disconnect', (event, ...args) => {
 })
 
 // ... do actions on behalf of the Renderer
-ipcMain.handle('startGraf', (event, ...args) => { 
+ipcMain.handle('startGraf', () => { 
    firstReadingDown=true 
    firstReadingUp=true 
    dataInterval=setInterval(function () {
@@ -150,6 +147,15 @@ client.on('close', function() {
   console.log('Connection closed');
 });
 
+function checkConnectStatus(data){
+  if(data.match(/WAP>/g)){
+   return "CONNECTED";
+  }else if(data.match(/User name or password is wrong/g)){
+    return "User name or password is wrong.";
+  }else{
+    return data;
+  }
+}
 
 function calculateBitRateDown(newBajt){  
       if(firstReadingDown){
