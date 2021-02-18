@@ -27,6 +27,7 @@ function createWindow () {
 app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
+  clearInterval(dataInterval)
   if(!client.destroyed){
     client.destroy();
   }
@@ -45,7 +46,7 @@ app.on('activate', () => {
 ipcMain.handle('connect', (event, ...args) => {
  //connect to client
   client.connect(23, '192.168.100.1', ()=> {
-    client.write('roo\r\n');
+    client.write('root\r\n');
     setTimeout(() => {
         client.setTimeout(0);
         client.write('admin\r\n');
