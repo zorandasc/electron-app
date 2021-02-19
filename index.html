@@ -31,18 +31,35 @@
     <button onclick="disConnect()">DisConnect</button>
     <button onclick="startGraf()" >Start</button>
 
+    <label for="ports">Choose ethernet port</label>
+    <select name="ports" id="ports" onchange="showalert()">
+        <option value="1">Ethernet 1</option>
+        <option value="2">Ethernet 2</option>
+        <option value="3">Ethernet 3</option>
+        <option value="4">Ethernet 4</option>
+    </select>
+
+    <label for="direct">Direction</label>
+    <select name="direct" id="direct" >
+        <option value="1">Bidirectional</option>
+        <option value="2">Downstream</option>
+        <option value="3">Upstream</option>
+    </select>
+
+
     <canvas id="mycanvas" width="500" height="200"></canvas>
     <script type="text/javascript" src="smoothie.js"></script>
     <script>
             const { ipcRenderer } = require('electron')
-
+           
         // Create a time series
             var series1 = new TimeSeries();
             var series2 = new TimeSeries();
 
             // Find the canvas
             var canvas = document.getElementById("mycanvas");
-            
+            var selPort = document.getElementById('ports');
+            var selDirect = document.getElementById('direct');
            
             // Create the chart
             var chart = new SmoothieChart({ 
@@ -64,9 +81,9 @@
 
             function connect(){
                 //posalji signal mainu za connect to host
-                ipcRenderer.invoke('connect')
-               
+                ipcRenderer.invoke('connect')    
             }
+
             //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
                document.getElementById("ta").innerHTML= arg;                
@@ -77,11 +94,13 @@
                 ipcRenderer.invoke('disconnect') 
             }
 
-
+            //posalji signal mainu da zapocne intervanu petlju ocitanja
+            //vrijednosti i vracanja natrag dole
             function startGraf(){
-                //posalji signal mainu da zapocne intervanu petlju ocitanja
-                //vrijednosti i vracanja natrag dole
-                ipcRenderer.invoke('startGraf')   
+                var choosenPort = selPort.options[selPort.selectedIndex].value
+                var choosenDir = selDirect.options[selDirect.selectedIndex].value
+
+                ipcRenderer.invoke('startGraf', choosenPort, choosenDir)   
             }
 
             //rezultati dobijeni od maina unutar koje imaintervalna petlja
@@ -96,6 +115,11 @@
                 series2.append(Date.now(), resultUp);
             })
             
+            function showalert() {
+                
+
+                }
+           
     </script>
 </body>
 
