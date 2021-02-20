@@ -8,20 +8,26 @@ client.setEncoding('utf8');
 var win;
 var dataInterval;
 
-var up=true
-var down=true
+var upDownDirection={
+  up:true,
+  down:true
+}
 
-var oldDown = 0
-var oldUp = 0
+var oldBajtDown = 0
+var oldBajtUp = 0
+
+var resultBRDown
+var resultBRUp
 
 var transmitString
 var receiveString
 
 var timeInterval = 4;
+
 var firstReadingDown=true 
 var firstReadingUp=true 
 
-var etherPortNum=1
+
 
 
 function createWindow () {
@@ -54,6 +60,7 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
 
  // ... do actions on behalf of the Renderer
 ipcMain.handle('connect', (event, ...args) => {
@@ -98,81 +105,56 @@ ipcMain.handle('disconnect', (event, ...args) => {
 // ... do actions on behalf of the Renderer
 ipcMain.handle('startGraf', (event, portNum , direction) => { 
 
-   switch(Number(direction)) {
-    case 2:
-      up=false
-      down=true
-      break;
-    case 3:
-      up=true
-      down=false
-      break;
-    default:
-      up=down=true
-  }
+   upDownDirection=calculateDirection(direction)
 
    firstReadingDown=true 
    firstReadingUp=true 
+
    clearInterval(dataInterval)
 
    intervalPortStatistics(portNum)
-
-
 })
 
-function intervalPortStatistics(portNum){
-  //stari nacin extraktovanja :              
-  //var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
-  //newDown= Number(String(trans).match(/(\d+)/g))
-  //novi nacin ekstraktovanja :
-  //https://javascript.info/regexp-lookahead-lookbehind <=operater 
-    if(portNum == 5){
-      //for wifi
-        transmitString=/(?<=TotalBytesSent \s\s+:\s)\d+/g
-        receiveString=/(?<=TotalBytesReceived \s\s+:\s)\d+/g
-        dataInterval=setInterval(()=> {
-          client.write(`get wlan basic laninst 1 wlaninst 1\r\n`);  
-          }, 
-        timeInterval*1000);
-    }else{
-      //for ethernet
-        transmitString=/(?<=tx_byte_ok \s\s+:\s)\d+/g
-        receiveString=/(?<=rx_byte_ok \s\s+:\s)\d+/g
-        dataInterval=setInterval(()=> {
-          client.write(`display portstatistics portnum ${portNum}\r\n`);  
-          }, 
-        timeInterval*1000);
-    }
-}
 
 
 client.on('data', function (data) {  
   
-  var transm = down && data.toString().match(transmitString)
+  //EVERY timeInterval CALCULATE DOWNSTREAM
+  var transm = upDownDirection.down && data.toString().match(transmitString)
   //transm= null, null, [ '881213013905' ], null, null
   if (transm) {
       
       //[ '881213013905' ] Izvadi string i pretvoru u number
-      var newDown=Number(transm[0]) 
-      
-      var resultDown=calculateBitRateDown(newDown)
-      
-      firstReadingDown=false
-      
-      win.webContents.send('resultValDown', resultDown)
+      var newBajtDown=Number(transm[0]) 
+
+      if(firstReadingDown){
+        oldBajtDown=newBajtDown
+        resultBRDown=0
+        firstReadingDown=false
+      }else{
+        resultBRDown=calculateBitRate(newBajtDown, oldBajtDown)
+        oldBajtDown=newBajtDown
+      }
+      win.webContents.send('resultValDown', resultBRDown)
   }
 
-  var receiv =up && data.toString().match(receiveString)
+
+  //EVERY timeInterval CALCULATE UPSTREAM
+  var receiv =upDownDirection.up && data.toString().match(receiveString)
   
   if (receiv) {
  
-      var newUp=Number(receiv[0]) 
-      
-      var resultUp=calculateBitRateUp(newUp)
+      var newBajtUp=Number(receiv[0]) 
 
-      firstReadingUp=false
-
-      win.webContents.send('resultValUp',  resultUp)  
+       if(firstReadingUp){
+        oldBajtUp=newBajtUp
+        resultBRUp=0
+        firstReadingUp=false
+      }else{
+        resultBRUp=calculateBitRate(newBajtUp, oldBajtUp)
+        oldBajtUp=newBajtUp
+      }
+      win.webContents.send('resultValUp',  resultBRUp)  
   }
 });
 
@@ -200,28 +182,47 @@ function checkConnectStatus(data){
   }
 }
 
-function calculateBitRateDown(newBajt){  
-      if(firstReadingDown){
-        oldDown=newBajt
-        result=0
-      }else{
-        result= (newBajt- oldDown)/timeInterval;//BAJTA/s
-        oldDown= newBajt
-        result = result * 8         //bits/s
-        result = result / 1000      //kbits/s
-      }
-      return result
+function calculateDirection(direction){
+  switch(Number(direction)) {
+    case 2:
+      return {up:false,down:true}
+      break;
+    case 3:
+      return {up:true,down:false}
+      break;
+    default:
+      return {up:true,down:true}
+  }
 }
 
-function calculateBitRateUp(newBajt){  
-      if(firstReadingUp){
-        oldUp=newBajt
-        result=0
-      }else{
-        result= (newBajt- oldUp)/timeInterval;//BAJTA/s
-        oldUp= newBajt
+function intervalPortStatistics(portNum){
+  //stari nacin extraktovanja :              
+  //var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
+  //newDown= Number(String(trans).match(/(\d+)/g))
+  //novi nacin ekstraktovanja :
+  //https://javascript.info/regexp-lookahead-lookbehind <=operater 
+    if(portNum == 5){
+      //for wifi
+        transmitString=/(?<=TotalBytesSent \s\s+:\s)\d+/g
+        receiveString=/(?<=TotalBytesReceived \s\s+:\s)\d+/g
+        dataInterval=setInterval(()=> {
+          client.write(`get wlan basic laninst 1 wlaninst 1\r\n`);  
+          }, 
+        timeInterval*1000);
+    }else{
+      //for ethernet
+        transmitString=/(?<=tx_byte_ok \s\s+:\s)\d+/g
+        receiveString=/(?<=rx_byte_ok \s\s+:\s)\d+/g
+        dataInterval=setInterval(()=> {
+          client.write(`display portstatistics portnum ${portNum}\r\n`);  
+          }, 
+        timeInterval*1000);
+    }
+}
+
+function calculateBitRate(newBajt, oldBajt){  
+        result= (newBajt- oldBajt)/timeInterval;//BAJTA/s
         result = result * 8         //bits/s
         result = result / 1000      //kbits/s
-      }
-      return result
+        return result
 }
