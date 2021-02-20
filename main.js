@@ -14,13 +14,15 @@ var down=true
 var oldDown = 0
 var oldUp = 0
 
+var transmitString
+var receiveString
+
 var timeInterval = 4;
 var firstReadingDown=true 
 var firstReadingUp=true 
 
 var etherPortNum=1
 
-//get wlan basic laninst 1 wlaninst 1
 
 function createWindow () {
   win = new BrowserWindow({
@@ -94,11 +96,9 @@ ipcMain.handle('disconnect', (event, ...args) => {
 })
 
 // ... do actions on behalf of the Renderer
-ipcMain.handle('startGraf', (event, arg1,arg2) => { 
-   
-   etherPortNum=arg1
+ipcMain.handle('startGraf', (event, portNum , direction) => { 
 
-   switch(Number(arg2)) {
+   switch(Number(direction)) {
     case 2:
       up=false
       down=true
@@ -110,33 +110,48 @@ ipcMain.handle('startGraf', (event, arg1,arg2) => {
     default:
       up=down=true
   }
-  console.log("up", up)
-  console.log("down", down)
 
    firstReadingDown=true 
    firstReadingUp=true 
    clearInterval(dataInterval)
 
-   dataInterval=setInterval(()=> {
-     client.write(`display portstatistics portnum ${etherPortNum}\r\n`);  
-  }, timeInterval*1000);
+   intervalPortStatistics(portNum)
+
+
 })
 
-//Drugi mozda nacina hendlovanja firstreading je
-//mozda koristenje clent.emmit("prvikurec") event-a
-//a zatim hvatanja eventa sa client.on('prvikurec',()=>{})
+function intervalPortStatistics(portNum){
+  //stari nacin extraktovanja :              
+  //var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
+  //newDown= Number(String(trans).match(/(\d+)/g))
+  //novi nacin ekstraktovanja :
+  //https://javascript.info/regexp-lookahead-lookbehind <=operater 
+    if(portNum == 5){
+      //for wifi
+        transmitString=/(?<=TotalBytesSent \s\s+:\s)\d+/g
+        receiveString=/(?<=TotalBytesReceived \s\s+:\s)\d+/g
+        dataInterval=setInterval(()=> {
+          client.write(`get wlan basic laninst 1 wlaninst 1\r\n`);  
+          }, 
+        timeInterval*1000);
+    }else{
+      //for ethernet
+        transmitString=/(?<=tx_byte_ok \s\s+:\s)\d+/g
+        receiveString=/(?<=rx_byte_ok \s\s+:\s)\d+/g
+        dataInterval=setInterval(()=> {
+          client.write(`display portstatistics portnum ${portNum}\r\n`);  
+          }, 
+        timeInterval*1000);
+    }
+}
 
-
-var transWifi= down && data.toString().match(/(?<=TotalBytesSent \s\s+:\s)\d+/g)
-var receiWifi =up && data.toString().match(/(?<=TotalBytesReceived \s\s+:\s)\d+/g)
 
 client.on('data', function (data) {  
-  //https://javascript.info/regexp-lookahead-lookbehind                 
-  //var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
-  var transm = down && data.toString().match(/(?<=tx_byte_ok \s\s+:\s)\d+/g)
-  console.log("transm", transm)
+  
+  var transm = down && data.toString().match(transmitString)
+  //transm= null, null, [ '881213013905' ], null, null
   if (transm) {
-      //newDown= Number(String(trans).match(/(\d+)/g))
+      
       //[ '881213013905' ] Izvadi string i pretvoru u number
       var newDown=Number(transm[0]) 
       
@@ -147,8 +162,8 @@ client.on('data', function (data) {
       win.webContents.send('resultValDown', resultDown)
   }
 
-  var receiv =up && data.toString().match(/(?<=rx_byte_ok \s\s+:\s)\d+/g)
-  console.log("receiv", receiv)
+  var receiv =up && data.toString().match(receiveString)
+  
   if (receiv) {
  
       var newUp=Number(receiv[0]) 
@@ -169,11 +184,11 @@ client.on('timeout', () => {
   client.destroy();
 });
 
-
 //clien destroyed
 client.on('close', function() {
   console.log('Connection closed');
 });
+
 
 function checkConnectStatus(data){
   if(data.match(/WAP>/g)){
@@ -197,6 +212,7 @@ function calculateBitRateDown(newBajt){
       }
       return result
 }
+
 function calculateBitRateUp(newBajt){  
       if(firstReadingUp){
         oldUp=newBajt
