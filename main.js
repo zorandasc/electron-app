@@ -8,6 +8,11 @@ client.setEncoding('utf8');
 var win;
 var dataInterval;
 
+var ipAdress="192.168.100.1";
+var port="23";
+var username="root";
+var password="admin";
+
 var upDownDirection={
   up:true,
   down:true
@@ -15,6 +20,8 @@ var upDownDirection={
 
 var oldBajtDown = 0
 var oldBajtUp = 0
+var newBajtDown;
+var newBajtUp;
 
 var resultBRDown
 var resultBRUp
@@ -65,11 +72,11 @@ app.on('activate', () => {
  // ... do actions on behalf of the Renderer
 ipcMain.handle('connect', (event, ...args) => {
  //connect to client
-  client.connect(23, '192.168.100.1', ()=> {
-    client.write('root\r\n');
+  client.connect(port, ipAdress, ()=> {
+    client.write(`${username}\r\n`);
     setTimeout(() => {
         client.setTimeout(0);
-        client.write('admin\r\n');
+        client.write(`${password}\r\n`);
         
         //ocitaj samo jednom status tokom konektovanja
         client.once("data",(data)=>{
@@ -115,8 +122,7 @@ ipcMain.handle('startGraf', (event, portNum , direction) => {
    intervalPortStatistics(portNum)
 })
 
-
-
+//na svaki interval ocitaj podatke
 client.on('data', function (data) {  
   
   //EVERY timeInterval CALCULATE DOWNSTREAM
@@ -125,16 +131,14 @@ client.on('data', function (data) {
   if (transm) {
       
       //[ '881213013905' ] Izvadi string i pretvoru u number
-      var newBajtDown=Number(transm[0]) 
+      newBajtDown=Number(transm[0]) 
 
-      if(firstReadingDown){
-        oldBajtDown=newBajtDown
-        resultBRDown=0
-        firstReadingDown=false
-      }else{
-        resultBRDown=calculateBitRate(newBajtDown, oldBajtDown)
-        oldBajtDown=newBajtDown
-      }
+      resultBRDown=firstReadingDown?0:calculateBitRate(newBajtDown, oldBajtDown)
+
+      oldBajtDown=newBajtDown
+
+      firstReadingDown=false
+
       win.webContents.send('resultValDown', resultBRDown)
   }
 
@@ -144,16 +148,14 @@ client.on('data', function (data) {
   
   if (receiv) {
  
-      var newBajtUp=Number(receiv[0]) 
+      newBajtUp=Number(receiv[0]) 
+  
+      resultBRUp=firstReadingUp?0:calculateBitRate(newBajtUp, oldBajtUp)
+    
+      oldBajtUp=newBajtUp
 
-       if(firstReadingUp){
-        oldBajtUp=newBajtUp
-        resultBRUp=0
-        firstReadingUp=false
-      }else{
-        resultBRUp=calculateBitRate(newBajtUp, oldBajtUp)
-        oldBajtUp=newBajtUp
-      }
+      firstReadingUp=false
+
       win.webContents.send('resultValUp',  resultBRUp)  
   }
 });
