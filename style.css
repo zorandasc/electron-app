@@ -1,0 +1,79 @@
+div.smoothie-chart-tooltip {
+  background: #444;
+  padding: 1em;
+  margin-top: 20px;
+  font-family: consolas;
+  color: white;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.toolbar {
+  background: rgb(26, 33, 34);
+}
+
+.toolbar-actions {
+  height: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.toolbar-actions .btn-positive {
+  cursor: pointer;
+  background: none;
+  padding: 0.5rem;
+  border-color: rgb(228, 100, 37);
+  color: rgb(228, 100, 37);
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+.form-group textarea {
+  background: rgb(119, 123, 123);
+}
+.form-group label {
+  color: rgb(234, 235, 235);
+}
+.tab-group {
+  border: none;
+}
+
+.tab-item {
+  cursor: pointer;
+  line-height: 1;
+  border: none;
+  color: rgb(234, 235, 235);
+  background: rgb(36, 44, 46);
+
+  transition: transform 0.5s;
+}
+
+.tab-item .img-circle {
+  color: rgb(234, 235, 235);
+}
+
+.tab-item span {
+  font-size: 1.5rem;
+
+  color: rgb(234, 235, 235);
+}
+
+.tab-item.active {
+  background: rgb(228, 100, 37);
+  color: rgb(36, 44, 46);
+
+  box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.6),
+    inset -4px -4px 6px -1px rgba(119, 123, 123, 0.7),
+    -0.5px -0.5px 0px rgba(119, 123, 123, 1),
+    0.5px 0.5px 0px rgba(0, 0, 0, 0.15), 0px 12px 10px -10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.01);
+}
+
+.window-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(26, 33, 34);
+}

@@ -2,53 +2,93 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>RGW Monitoring Application</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="./css/photon.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<style>
-    div.smoothie-chart-tooltip {
-        background: #444;
-        padding: 1em;
-        margin-top: 20px;
-        font-family: consolas;
-        color: white;
-        font-size: 10px;
-        pointer-events: none;
-}
-</style>
-<body style="background: white;">
-    <h1>Hello World!</h1>
-    <p>
-        We are using node
-        <script>document.write(process.versions.node)</script>,
-        Chrome
-        <script>document.write(process.versions.chrome)</script>,
-        and Electron
-        <script>document.write(process.versions.electron)</script>.
-    </p>
-    <textarea id="ta" name="ta" rows="1" cols="40" readonly></textarea>
-    <button onclick="connect()">Connect</button>
-    <button onclick="disConnect()">DisConnect</button>
-    <button onclick="startGraf()" >Start</button>
-
-    <label for="ports">Choose ethernet port</label>
-    <select name="ports" id="ports" onchange="showalert()">
-        <option value="1">Ethernet 1</option>
-        <option value="2">Ethernet 2</option>
-        <option value="3">Ethernet 3</option>
-        <option value="4">Ethernet 4</option>
-        <option value="5">WiFi</option>
-    </select>
-
-    <label for="direct">Direction</label>
-    <select name="direct" id="direct" >
-        <option value="1">Bidirectional</option>
-        <option value="2">Downstream</option>
-        <option value="3">Upstream</option>
-    </select>
-
-
-    <canvas id="mycanvas" width="500" height="200"></canvas>
+<body >
+    <div class="window">
+        <header class="toolbar toolbar-header">
+            
+        
+            <div class="toolbar-actions">
+                <button class="btn btn-positive" onclick="connect()">Connect
+                </button>
+                <div class="form-group">
+                    <label>STATUS:</label>
+                    <textarea  class="form-control" style="margin-bottom: 1rem;" id="ta" name="ta" rows="1" cols="40" readonly></textarea>
+                </div>
+            </div>
+        </header>
+        <div class="tab-group">
+            <div class="tab-item">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 1</p>
+            </div>
+            <div class="tab-item active">
+                <img class="img-circle media-object" src="./assets/ether.png" width="32" height="32">
+                <p>Ethernet 2</p>
+            </div>
+            <div class="tab-item">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 3</p>
+            </div>
+            <div class="tab-item">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 4</p>
+            </div>
+            <div class="tab-item">
+                <img class="img-circle media-object" src="./assets/wifiWhite.png" width="32" height="32">
+                <p>WiFi</p>
+            </div>
+        </div>
+        <div class="window-content">
+            <!--
+ <button class="btn btn-negative" onclick="disConnect()">DisConnect
+                    </button>
+                <button class="btn btn-primary" onclick="startGraf()">Start
+                    </button>
+            <label for="ports">Choose ethernet port</label>
+            <select name="ports" id="ports" onchange="showalert()">
+                <option value="1">Ethernet 1</option>
+                <option value="2">Ethernet 2</option>
+                <option value="3">Ethernet 3</option>
+                <option value="4">Ethernet 4</option>
+                <option value="5">WiFi</option>
+            </select>
+                    
+            <label for="direct">Direction</label>
+            <select name="direct" id="direct">
+                <option value="1">Bidirectional</option>
+                <option value="2">Downstream</option>
+                <option value="3">Upstream</option>
+            </select>
+                -->
+                    
+            <canvas id="mycanvas"  width="500" height="200"></canvas>
+             
+        </div>
+        <div class="tab-group">
+            
+            <div class="tab-item">
+                <span class="icon icon-stop"></span>
+                <p>STOP</p>
+            </div>
+            <div class="tab-item">
+                <span class="icon icon-play"></span>
+                <p>START</p>
+            </div>
+            <div class="tab-item">
+                <span class="icon icon-pause"></span>
+                <p>PAUSE</p>
+            </div>
+            
+            
+        </div>
+    </div>
+  
+    
     <script type="text/javascript" src="smoothie.js"></script>
     <script>
             const { ipcRenderer } = require('electron')
