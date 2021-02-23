@@ -156,7 +156,7 @@ client.on("data", function (data) {
 //cliesnt timeout
 client.on("timeout", () => {
   console.log("socket timeout");
-  win.webContents.send("connect-result", "Time out.");
+  win.webContents.send("connect-result", "Time out. Check host IP address.");
   console.log(client.timeout);
   client.destroy();
 });
@@ -170,7 +170,7 @@ function checkConnectStatus(data) {
   if (data.match(/WAP>/g)) {
     return "Connection open.";
   } else if (data.match(/User name or password is wrong/g)) {
-    return "User name or password is wrong.";
+    return "Username or password is wrong.";
   } else {
     return data;
   }
