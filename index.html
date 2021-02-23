@@ -18,10 +18,11 @@
                 <button class="btn btn-positive" onclick="disConnect()" id="discntBtn">DisConnect
                 </button>
                 <div class="form-group">
-                    <label>STATUS:</label>
                     <textarea 
                         class="form-control" 
-                         id="ta" name="ta" rows="1" cols="40" readonly></textarea>
+                        id="ta" name="ta" rows="2" cols="40"
+                        placeholder="Connection closed"
+                        readonly></textarea>
                 </div>
             </div>
         </header>
@@ -135,15 +136,21 @@
             //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
                 console.log(arg)
-               if(arg.toString()=="CONNECTED"){
+               if(arg.toString()=="Connection open."){
                     ctnBtn.style.display = 'none'
                     dctnBtn.style.display="block"
                     textarea.style.color="lightgreen"
                     
-               }else{
+               }else if (arg.toString() == "Connection closed." || arg.toString() == "Conecting...."){
                     ctnBtn.style.display = 'block'
                     dctnBtn.style.display = "none"
                     textarea.style.color = "lightblue"
+               }else{
+                   //ERROR OCURED
+                  ctnBtn.style.display = 'none'
+                  dctnBtn.style.display = "block"
+                  textarea.style.color = "rgb(245, 87, 111)"
+                  
                }
               
                textarea.innerHTML= arg; 

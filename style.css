@@ -36,9 +36,13 @@ div.smoothie-chart-tooltip {
 }
 
 .form-group textarea {
-  color: rgb(234, 235, 235);
   background-color: rgb(36, 44, 46);
-  margin-bottom: 1rem;
+  color: rgb(245, 87, 111);
+  letter-spacing: 2px;
+}
+.form-group textarea::placeholder {
+  color: lightblue;
+  letter-spacing: 2px;
 }
 
 .form-group label {
