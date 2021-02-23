@@ -13,11 +13,15 @@
             
         
             <div class="toolbar-actions">
-                <button class="btn btn-positive" onclick="connect()">Connect
+                <button class="btn btn-positive" onclick="connect()" id="cntBtn">Connect
+                </button>
+                <button class="btn btn-positive" onclick="disConnect()" id="discntBtn">DisConnect
                 </button>
                 <div class="form-group">
                     <label>STATUS:</label>
-                    <textarea  class="form-control" style="margin-bottom: 1rem;" id="ta" name="ta" rows="1" cols="40" readonly></textarea>
+                    <textarea 
+                        class="form-control" 
+                         id="ta" name="ta" rows="1" cols="40" readonly></textarea>
                 </div>
             </div>
         </header>
@@ -101,7 +105,10 @@
             var canvas = document.getElementById("mycanvas");
             var selPort = document.getElementById('ports');
             var selDirect = document.getElementById('direct');
-           
+            var ctnBtn=document.getElementById('cntBtn')
+            var dctnBtn=document.getElementById('discntBtn')
+            var textarea= document.getElementById("ta")
+
             // Create the chart
             var chart = new SmoothieChart({ 
                 labels: { fontSize: 15 },
@@ -127,7 +134,20 @@
 
             //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
-               document.getElementById("ta").innerHTML= arg;                
+                console.log(arg)
+               if(arg.toString()=="CONNECTED"){
+                    ctnBtn.style.display = 'none'
+                    dctnBtn.style.display="block"
+                    textarea.style.color="lightgreen"
+                    
+               }else{
+                    ctnBtn.style.display = 'block'
+                    dctnBtn.style.display = "none"
+                    textarea.style.color = "lightblue"
+               }
+              
+               textarea.innerHTML= arg; 
+                     
             })
 
             function disConnect() {

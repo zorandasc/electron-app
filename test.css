@@ -1,3 +1,46 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100vh;
+  background: rgb(26, 33, 34);
+  color: rgb(234, 235, 235);
+}
+.window {
+  height: 100%;
+  padding: 1rem;
+}
+
+.connect {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+}
+
+.btn-positive {
+  cursor: pointer;
+  background: none;
+  padding: 0.5rem;
+  border-color: rgb(228, 100, 37);
+  color: rgb(228, 100, 37);
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+.form-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-group textarea {
+  background: rgb(119, 123, 123);
+}
+.form-group label {
+  padding-right: 1rem;
+  color: rgb(234, 235, 235);
+}
+
 div.smoothie-chart-tooltip {
   background: #444;
   padding: 1em;
@@ -8,63 +51,28 @@ div.smoothie-chart-tooltip {
   pointer-events: none;
 }
 
-.toolbar {
-  background: rgb(26, 33, 34);
-}
-
-.toolbar-actions {
-  height: 3rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-
-.toolbar-actions .btn-positive {
-  cursor: pointer;
-  background: none;
-  padding: 0.5rem;
-  border-color: rgb(228, 100, 37);
-  color: rgb(228, 100, 37);
-  font-size: 20px;
-  letter-spacing: 2px;
-}
-
-#discntBtn {
-  display: none;
-}
-
-.form-group textarea {
-  color: rgb(234, 235, 235);
-  background-color: rgb(36, 44, 46);
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  color: rgb(234, 235, 235);
-}
 .tab-group {
+  width: 100%;
+  display: flex;
   border: none;
 }
 
 .tab-item {
+  flex: 1;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   line-height: 1;
   border: none;
   color: rgb(234, 235, 235);
   background: rgb(36, 44, 46);
-
   transition: transform 0.5s;
 }
 
 .tab-item .img-circle {
-  color: rgb(234, 235, 235);
-}
-
-.tab-item span {
-  font-size: 1.5rem;
-
+  margin-right: 1rem;
   color: rgb(234, 235, 235);
 }
 
@@ -79,9 +87,11 @@ div.smoothie-chart-tooltip {
   border: 1px solid rgba(0, 0, 0, 0.01);
 }
 
-.window-content {
+.graf {
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgb(26, 33, 34);
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }

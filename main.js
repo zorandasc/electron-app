@@ -101,6 +101,7 @@ ipcMain.handle('connect', (event, ...args) => {
  
 // ... do actions on behalf of the Renderer
 ipcMain.handle('disconnect', (event, ...args) => {
+  console.log(...args)
   win.webContents.send('connect-result','Connection closed')
 
    clearInterval(dataInterval)
