@@ -13,8 +13,6 @@ var port = "23";
 var username = "root";
 var password = "admin";
 
-var isConnected=false
-
 var upDownDirection = {
   up: true,
   down: true,
@@ -70,17 +68,26 @@ app.on("activate", () => {
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
   //connect to client
-  client.connect(port, ipAdress,() => {
+  client.connect(port, ipAdress, () => {
     client.write(`${username}\r\n`);
     setTimeout(() => {
-      client.write(`${password}\r\n`);
       client.setTimeout(0);
-    }, 2000)   
+      client.write(`${password}\r\n`);
+
+      //ocitaj samo jednom status tokom konektovanja
+      client.once("data", (data) => {
+        var data = data.toString();
+
+        var status = checkConnectStatus(data);
+
+        win.webContents.send("connect-result", status);
+      });
+    }, 2000);
   });
 
-  //ovo je bitno ako je npr. pogrsna ip adrsesa
+  //ovo je bitno ako je pogrsna ip adrsesa
   if (client.connecting) {
-    console.log("client.connecting",client.connecting);
+    console.log(client.connecting);
     win.webContents.send("connect-result", "Conecting....");
     //setuj time out na 9 sekundi =>ovo  ce nas odvesti nakon 9s na ontimeuout listener
     client.setTimeout(9000);
@@ -89,9 +96,9 @@ ipcMain.handle("connect", (event, ...args) => {
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle("disconnect", (event, ...args) => {
+  console.log(...args);
   win.webContents.send("connect-result", "Connection closed.");
-  //console.log(...args);
-  isConnected=false
+
   clearInterval(dataInterval);
   if (!client.destroyed) {
     client.destroy();
@@ -110,18 +117,8 @@ ipcMain.handle("startGraf", (event, portNum, direction) => {
   intervalPortStatistics(portNum);
 });
 
-client.on('error',(arg)=>{
-    console.log("ERORRONJA",arg)
-    client.destroy()
-})
-
 //na svaki interval ocitaj podatke
 client.on("data", function (data) {
-  //on connecting
-  if(!isConnected){
-    var data = data.toString();
-    isConnected = checkConnectStatus(data);
-  }
   //EVERY timeInterval CALCULATE DOWNSTREAM
   var transm = upDownDirection.down && data.toString().match(transmitString);
   //transm= null, null, [ '881213013905' ], null, null
@@ -160,6 +157,7 @@ client.on("data", function (data) {
 client.on("timeout", () => {
   console.log("socket timeout");
   win.webContents.send("connect-result", "Time out. Check host IP address.");
+  console.log(client.timeout);
   client.destroy();
 });
 
@@ -169,19 +167,13 @@ client.on("close", function () {
 });
 
 function checkConnectStatus(data) {
-  console.log("DATAONJA", data)
-  var status="";
-  var connected=false
   if (data.match(/WAP>/g)) {
-    connected=true
-    status= "Connection open.";
+    return "Connection open.";
   } else if (data.match(/User name or password is wrong/g)) {
-    status= "Username or password is wrong.";
+    return "Username or password is wrong.";
   } else {
-    status= data.trim();
+    return data;
   }
-  win.webContents.send("connect-result", status);
-  return connected
 }
 
 function calculateDirection(direction) {
