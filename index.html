@@ -142,7 +142,10 @@
 
             function getPortid(number){
                 if(!grafStarted){
+                    //remove active sa starog elementa
+                    document.getElementById(choosenPort).classList.remove("active")
                     choosenPort = number;
+                    //add active na novi element
                     document.getElementById(number).classList.add("active")
                 }
                 
