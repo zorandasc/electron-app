@@ -15,10 +15,8 @@ var password = "admin";
 
 var isConnected=false
 
-var upDownDirection = {
-  up: true,
-  down: true,
-};
+var downDirection = true
+var upDirection = true
 
 var oldBajtDown = 0;
 var oldBajtUp = 0;
@@ -80,7 +78,6 @@ ipcMain.handle("connect", (event, ...args) => {
 
   //ovo je bitno ako je npr. pogrsna ip adrsesa
   if (client.connecting) {
-    console.log("client.connecting",client.connecting);
     win.webContents.send("connect-result", "Conecting....");
     //setuj time out na 9 sekundi =>ovo  ce nas odvesti nakon 9s na ontimeuout listener
     client.setTimeout(9000);
@@ -92,6 +89,8 @@ ipcMain.handle("disconnect", (event, ...args) => {
   win.webContents.send("connect-result", "Connection closed.");
   //console.log(...args);
   isConnected=false
+  firstReadingDown = true;
+  firstReadingUp = true;
   clearInterval(dataInterval);
   if (!client.destroyed) {
     client.destroy();
@@ -99,36 +98,53 @@ ipcMain.handle("disconnect", (event, ...args) => {
 });
 
 // ... do actions on behalf of the Renderer
-ipcMain.handle("startGraf", (event, portNum, direction) => {
-  upDownDirection = calculateDirection(direction);
+ipcMain.handle("startGraf", (event, portNum, down,up) => {
+  //set direction true or flase
+  downDirection = down;
+  upDirection = up;
 
   firstReadingDown = true;
   firstReadingUp = true;
 
-  clearInterval(dataInterval);
-
-  intervalPortStatistics(portNum);
+  console.log("STARTED.",downDirection, upDirection, portNum)
+  //start new interval reading with choosen portnum
+  intervalPortStatistics(Number(portNum));
 });
+
+ipcMain.handle("stopGraf", () => {
+    //if firstreading true result=0
+  firstReadingDown = true;
+  firstReadingUp = true;
+
+  //clear old loop interval
+  clearInterval(dataInterval);
+  console.log("STOPED")
+})
+
+
 
 client.on('error',(arg)=>{
     console.log("ERORRONJA",arg)
     client.destroy()
 })
 
+
+
 //na svaki interval ocitaj podatke
 client.on("data", function (data) {
-  //on connecting
+  //on connecting, if isConnected true skip this if
+  
   if(!isConnected){
     var data = data.toString();
     isConnected = checkConnectStatus(data);
   }
-  //EVERY timeInterval CALCULATE DOWNSTREAM
-  var transm = upDownDirection.down && data.toString().match(transmitString);
-  //transm= null, null, [ '881213013905' ], null, null
+  //EVERY timeInterval CALCULATE DOWNSTREAM if downDirection false do nothing
+  var transm = downDirection && data.toString().match(transmitString);
+  //result:  transm= null, null, [ '881213013905' ], null, null
   if (transm) {
     //[ '881213013905' ] Izvadi string i pretvoru u number
     newBajtDown = Number(transm[0]);
-
+    
     resultBRDown = firstReadingDown
       ? 0
       : calculateBitRate(newBajtDown, oldBajtDown);
@@ -140,8 +156,8 @@ client.on("data", function (data) {
     win.webContents.send("resultValDown", resultBRDown);
   }
 
-  //EVERY timeInterval CALCULATE UPSTREAM
-  var receiv = upDownDirection.up && data.toString().match(receiveString);
+  //EVERY timeInterval CALCULATE UPSTREAM, if upDirection flase do notihing
+  var receiv = upDirection && data.toString().match(receiveString);
 
   if (receiv) {
     newBajtUp = Number(receiv[0]);
@@ -169,7 +185,6 @@ client.on("close", function () {
 });
 
 function checkConnectStatus(data) {
-  console.log("DATAONJA", data)
   var status="";
   var connected=false
   if (data.match(/WAP>/g)) {
@@ -184,23 +199,7 @@ function checkConnectStatus(data) {
   return connected
 }
 
-function calculateDirection(direction) {
-  switch (Number(direction)) {
-    case 2:
-      return { up: false, down: true };
-      break;
-    case 3:
-      return { up: true, down: false };
-      break;
-    default:
-      return { up: true, down: true };
-  }
-}
-
 function intervalPortStatistics(portNum) {
-  //stari nacin extraktovanja :
-  //var trans = data.toString().match(/tx_byte_ok \s\s+:\s(\d+)/g)
-  //newDown= Number(String(trans).match(/(\d+)/g))
   //novi nacin ekstraktovanja :
   //https://javascript.info/regexp-lookahead-lookbehind <=operater
   if (portNum == 5) {

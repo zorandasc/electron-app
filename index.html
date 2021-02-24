@@ -27,26 +27,27 @@
             </div>
         </header>
         <div class="tab-group">
-            <div class="tab-item">
-                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
-                <p>Ethernet 1</p>
-            </div>
-            <div class="tab-item active">
-                <img class="img-circle media-object" src="./assets/ether.png" width="32" height="32">
-                <p>Ethernet 2</p>
-            </div>
-            <div class="tab-item">
-                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
-                <p>Ethernet 3</p>
-            </div>
-            <div class="tab-item">
-                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
-                <p>Ethernet 4</p>
-            </div>
-            <div class="tab-item">
+            <div class="tab-item active"  id="5" onclick="getPortid(5)">
                 <img class="img-circle media-object" src="./assets/wifiWhite.png" width="32" height="32">
                 <p>WiFi</p>
             </div>
+            <div class="tab-item" id="1" onclick="getPortid(1)">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 1</p>
+            </div>
+            <div class="tab-item" id="2" onclick="getPortid(2)">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 2</p>
+            </div>
+            <div class="tab-item" id="3" onclick="getPortid(3)">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 3</p>
+            </div>
+            <div class="tab-item" id="4" onclick="getPortid(4)">
+                <img class="img-circle media-object" src="./assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 4</p>
+            </div>
+           
         </div>
         <div class="window-content">
             <!--
@@ -74,19 +75,20 @@
             <canvas id="mycanvas"  width="500" height="200"></canvas>
              
         </div>
-        <div class="tab-group">
-            
-            <div class="tab-item">
+        <div class="tab-group">           
+            <div class="tab-item active2" id="down" onclick="setDownUp('down')">
+                <p>DONSTREAM</p>
+            </div>
+            <div class="tab-item" id="stop" onclick="stopGraf()">
                 <span class="icon icon-stop"></span>
                 <p>STOP</p>
             </div>
-            <div class="tab-item">
+            <div class="tab-item" id="start" onclick="startGraf()">
                 <span class="icon icon-play"></span>
                 <p>START</p>
             </div>
-            <div class="tab-item">
-                <span class="icon icon-pause"></span>
-                <p>PAUSE</p>
+            <div class="tab-item active2" id="up" onclick="setDownUp('up')">
+                <p>UPSTREAM</p>
             </div>
             
             
@@ -98,17 +100,28 @@
     <script defer>
             const { ipcRenderer } = require('electron')
            
-        // Create a time series
-            var series1 = new TimeSeries();
-            var series2 = new TimeSeries();
+            var choosenPort =5;
+            var down=true;
+            var up=true;
+            var grafStarted=false;
 
-            // Find the canvas
+            // Find the element
             var canvas = document.getElementById("mycanvas");
-            var selPort = document.getElementById('ports');
-            var selDirect = document.getElementById('direct');
+
             var ctnBtn=document.getElementById('cntBtn')
             var dctnBtn=document.getElementById('discntBtn')
+
             var textarea= document.getElementById("ta")
+
+            var start = document.getElementById("start")
+            var stop = document.getElementById("stop")
+
+            var downBtn = document.getElementById("down")
+            var upBtn = document.getElementById("up")
+
+            // Create a time series
+            var series1 = new TimeSeries();
+            var series2 = new TimeSeries();
 
             // Create the chart
             var chart = new SmoothieChart({ 
@@ -116,8 +129,7 @@
                 tooltip: true, 
                 minValue: 0, 
                 timestampFormatter: SmoothieChart.timeFormatter,
-                maxValueScale: 1.2
-                
+                maxValueScale: 1.2 
             });
 
             chart.addTimeSeries(series1, { lineWidth: 3, strokeStyle: '#00ff00', fillStyle: 'rgba(0, 255, 0, 0.4)' });
@@ -128,34 +140,30 @@
             //chart.start();
             //chart.stop();
 
+            function getPortid(number){
+                if(!grafStarted){
+                    choosenPort = number;
+                    document.getElementById(number).classList.add("active")
+                }
+                
+            }
+
+            function setDownUp(direction){
+                if(!grafStarted){
+                    if(direction=="down"){
+                        down = !down
+                        downBtn.classList.toggle("active2")
+                    }else{
+                        up=!up
+                        upBtn.classList.toggle("active2")
+                    } 
+                }
+            }
+
             function connect(){
                 //posalji signal mainu za connect to host
                 ipcRenderer.invoke('connect')    
             }
-
-            //status dobijen od mejna tokom i konektovanja
-            ipcRenderer.on('connect-result', function (event, arg) {
-                console.log(arg)
-               if(arg.toString()=="Connection open."){
-                    ctnBtn.style.display = 'none'
-                    dctnBtn.style.display="block"
-                    textarea.style.color="lightgreen"
-                    
-               }else if (arg.toString() == "Connection closed." || arg.toString() == "Conecting...."){
-                    ctnBtn.style.display = 'block'
-                    dctnBtn.style.display = "none"
-                    textarea.style.color = "lightblue"
-               }else{
-                   //ERROR OCURED
-                  ctnBtn.style.display = 'none'
-                  dctnBtn.style.display = "block"
-                  textarea.style.color = "rgb(245, 87, 111)"
-                  
-               }
-              
-               textarea.innerHTML= arg; 
-                     
-            })
 
             function disConnect() {
                 //posalji signal mainu za diskonect from host
@@ -163,13 +171,45 @@
             }
 
             //posalji signal mainu da zapocne intervanu petlju ocitanja
-            //vrijednosti i vracanja natrag dole
+            //vrijednosti 
             function startGraf(){
-                var choosenPort = selPort.options[selPort.selectedIndex].value
-                var choosenDir = selDirect.options[selDirect.selectedIndex].value
-
-                ipcRenderer.invoke('startGraf', choosenPort, choosenDir)   
+                start.style.display="none"
+                stop.style.display="block"
+                stop.classList.add("active2") 
+                grafStarted=true
+                ipcRenderer.invoke('startGraf', choosenPort, down,up)  
+                
             }
+            
+            function stopGraf() {
+                start.style.display = "block"
+                stop.style.display = "none"
+
+                ipcRenderer.invoke('stopGraf') 
+            }
+
+            //status dobijen od mejna tokom i konektovanja
+            ipcRenderer.on('connect-result', function (event, arg) {
+                console.log(arg)
+                if (arg.toString() == "Connection open.") {
+                    ctnBtn.style.display = 'none'
+                    dctnBtn.style.display = "block"
+                    textarea.style.color = "lightgreen"
+
+                } else if (arg.toString() == "Connection closed." || arg.toString() == "Conecting....") {
+                    ctnBtn.style.display = 'block'
+                    dctnBtn.style.display = "none"
+                    textarea.style.color = "lightblue"
+                } else {
+                    //ENYTHING ELSE including ERROR OCURED
+                    ctnBtn.style.display = 'none'
+                    dctnBtn.style.display = "block"
+                    textarea.style.color = "rgb(245, 87, 111)"
+                }
+
+                textarea.innerHTML = arg;
+
+            })
 
             //rezultati dobijeni od maina unutar koje imaintervalna petlja
             ipcRenderer.on('resultValDown', function (event, arg) {              
@@ -182,11 +222,6 @@
                 var resultUp = Number(arg);
                 series2.append(Date.now(), resultUp);
             })
-            
-            function showalert() {
-                
-
-                }
            
     </script>
 </body>

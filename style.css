@@ -58,7 +58,7 @@ div.smoothie-chart-tooltip {
   border: none;
   color: rgb(234, 235, 235);
   background: rgb(36, 44, 46);
-
+  border: 1px solid rgba(0, 0, 0, 0.01);
   transition: transform 0.5s;
 }
 
@@ -68,13 +68,25 @@ div.smoothie-chart-tooltip {
 
 .tab-item span {
   font-size: 1.5rem;
-
   color: rgb(234, 235, 235);
+}
+.tab-item p {
+  letter-spacing: 2px;
 }
 
 .tab-item.active {
   background: rgb(228, 100, 37);
-  color: rgb(36, 44, 46);
+  color: rgb(234, 235, 235);
+
+  box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.6),
+    inset -4px -4px 6px -1px rgba(119, 123, 123, 0.7),
+    -0.5px -0.5px 0px rgba(119, 123, 123, 1),
+    0.5px 0.5px 0px rgba(0, 0, 0, 0.15), 0px 12px 10px -10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.01);
+}
+
+.tab-item.active2 {
+  color: rgb(234, 235, 235);
 
   box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.6),
     inset -4px -4px 6px -1px rgba(119, 123, 123, 0.7),
@@ -88,4 +100,8 @@ div.smoothie-chart-tooltip {
   justify-content: center;
   align-items: center;
   background: rgb(26, 33, 34);
+}
+
+#stop {
+  display: none;
 }
