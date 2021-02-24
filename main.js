@@ -13,10 +13,10 @@ var port = "23";
 var username = "root";
 var password = "admin";
 
-var isConnected=false
+var isConnected = false;
 
-var downDirection = true
-var upDirection = true
+var downDirection = true;
+var upDirection = true;
 
 var oldBajtDown = 0;
 var oldBajtUp = 0;
@@ -68,12 +68,12 @@ app.on("activate", () => {
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
   //connect to client
-  client.connect(port, ipAdress,() => {
+  client.connect(port, ipAdress, () => {
     client.write(`${username}\r\n`);
     setTimeout(() => {
       client.write(`${password}\r\n`);
       client.setTimeout(0);
-    }, 2000)   
+    }, 2000);
   });
 
   //ovo je bitno ako je npr. pogrsna ip adrsesa
@@ -88,7 +88,7 @@ ipcMain.handle("connect", (event, ...args) => {
 ipcMain.handle("disconnect", (event, ...args) => {
   win.webContents.send("connect-result", "Connection closed.");
   //console.log(...args);
-  isConnected=false
+  isConnected = false;
   firstReadingDown = true;
   firstReadingUp = true;
   clearInterval(dataInterval);
@@ -98,7 +98,7 @@ ipcMain.handle("disconnect", (event, ...args) => {
 });
 
 // ... do actions on behalf of the Renderer
-ipcMain.handle("startGraf", (event, portNum, down,up) => {
+ipcMain.handle("startGraf", (event, portNum, down, up) => {
   //set direction true or flase
   downDirection = down;
   upDirection = up;
@@ -106,35 +106,32 @@ ipcMain.handle("startGraf", (event, portNum, down,up) => {
   firstReadingDown = true;
   firstReadingUp = true;
 
-  console.log("STARTED.",downDirection, upDirection, portNum)
+  console.log("STARTED.", downDirection, upDirection, portNum);
   //start new interval reading with choosen portnum
   intervalPortStatistics(Number(portNum));
 });
 
 ipcMain.handle("stopGraf", () => {
-    //if firstreading true result=0
+  //if firstreading true result=0
   firstReadingDown = true;
   firstReadingUp = true;
 
   //clear old loop interval
   clearInterval(dataInterval);
-  console.log("STOPED")
-})
+  win.webContents.send("resultValDown", 0);
+  win.webContents.send("resultValUp", 0);
+  console.log("STOPED");
+});
 
-
-
-client.on('error',(arg)=>{
-    console.log("ERORRONJA",arg)
-    client.destroy()
-})
-
-
+client.on("error", (arg) => {
+  console.log("ERORRONJA", arg);
+  client.destroy();
+});
 
 //na svaki interval ocitaj podatke
 client.on("data", function (data) {
   //on connecting, if isConnected true skip this if
-  
-  if(!isConnected){
+  if (!isConnected) {
     var data = data.toString();
     isConnected = checkConnectStatus(data);
   }
@@ -144,7 +141,7 @@ client.on("data", function (data) {
   if (transm) {
     //[ '881213013905' ] Izvadi string i pretvoru u number
     newBajtDown = Number(transm[0]);
-    
+
     resultBRDown = firstReadingDown
       ? 0
       : calculateBitRate(newBajtDown, oldBajtDown);
@@ -185,18 +182,18 @@ client.on("close", function () {
 });
 
 function checkConnectStatus(data) {
-  var status="";
-  var connected=false
+  var status = "";
+  var connected = false;
   if (data.match(/WAP>/g)) {
-    connected=true
-    status= "Connection open.";
+    connected = true;
+    status = "Connection open.";
   } else if (data.match(/User name or password is wrong/g)) {
-    status= "Username or password is wrong.";
+    status = "Username or password is wrong.";
   } else {
-    status= data.trim();
+    status = data.trim();
   }
   win.webContents.send("connect-result", status);
-  return connected
+  return connected;
 }
 
 function intervalPortStatistics(portNum) {

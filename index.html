@@ -47,31 +47,11 @@
             </div>
            
         </div>
-        <div class="window-content">
-            <!--
- <button class="btn btn-negative" onclick="disConnect()">DisConnect
-                    </button>
-                <button class="btn btn-primary" onclick="startGraf()">Start
-                    </button>
-            <label for="ports">Choose ethernet port</label>
-            <select name="ports" id="ports" onchange="showalert()">
-                <option value="1">Ethernet 1</option>
-                <option value="2">Ethernet 2</option>
-                <option value="3">Ethernet 3</option>
-                <option value="4">Ethernet 4</option>
-                <option value="5">WiFi</option>
-            </select>
-                    
-            <label for="direct">Direction</label>
-            <select name="direct" id="direct">
-                <option value="1">Bidirectional</option>
-                <option value="2">Downstream</option>
-                <option value="3">Upstream</option>
-            </select>
-                -->
-                    
-            <canvas id="mycanvas"  width="500" height="200"></canvas>
-             
+        <div class="dialog" id="dialog">
+            <p>Sorry. Connection is closed.</p>
+        </div>
+        <div class="window-content">       
+            <canvas id="mycanvas"  width="550" height="250"></canvas>      
         </div>
         <div class="tab-group">           
             <div class="tab-item active2" id="down" onclick="setDownUp('down')">
@@ -102,6 +82,7 @@
             var down=true;
             var up=true;
             var grafStarted=false;
+            var connectionOpen=false;
 
             // Find the element
             var canvas = document.getElementById("mycanvas");
@@ -117,6 +98,7 @@
             var downBtn = document.getElementById("down")
             var upBtn = document.getElementById("up")
 
+            var dialog = document.getElementById("dialog")
             // Create a time series
             var series1 = new TimeSeries();
             var series2 = new TimeSeries();
@@ -167,6 +149,7 @@
             }
 
             function disConnect() {
+                connectionOpen = false
                 //posalji signal mainu za diskonect from host
                 ipcRenderer.invoke('disconnect') 
             }
@@ -174,18 +157,25 @@
             //posalji signal mainu da zapocne intervanu petlju ocitanja
             //vrijednosti 
             function startGraf(){
-                start.style.display="none"
-                stop.style.display="block"
-                stop.classList.add("active2") 
-                grafStarted=true
-                ipcRenderer.invoke('startGraf', choosenPort, down,up)  
+                if(connectionOpen){
+                    start.style.display="none"
+                    stop.style.display="block"
+                    stop.classList.add("active2") 
+                    grafStarted=true
+                    ipcRenderer.invoke('startGraf', choosenPort, down,up) 
+                } else {
+                    dialog.style.transform = "translateX(1rem)"
+                    setTimeout(()=>{
+                        dialog.style.transform= "translateX(-12rem)"
+                    }, 3000)
+                }
                 
             }
             
             function stopGraf() {
                 start.style.display = "block"
                 stop.style.display = "none"
-
+                grafStarted = false
                 ipcRenderer.invoke('stopGraf') 
             }
 
@@ -193,6 +183,7 @@
             ipcRenderer.on('connect-result', function (event, arg) {
                 console.log(arg)
                 if (arg.toString() == "Connection open.") {
+                    connectionOpen=true
                     ctnBtn.style.display = 'none'
                     dctnBtn.style.display = "block"
                     textarea.style.color = "lightgreen"

@@ -103,3 +103,21 @@ div.smoothie-chart-tooltip {
 #stop {
   display: none;
 }
+
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 12rem;
+  background: rgb(228, 100, 37, 0.4);
+  z-index: 10;
+  transform: translateX(-12rem);
+  transition: transform 0.5s;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.dialog p {
+  color: rgb(234, 235, 235);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+}
