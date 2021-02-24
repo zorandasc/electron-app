@@ -92,6 +92,8 @@ ipcMain.handle("disconnect", (event, ...args) => {
   firstReadingDown = true;
   firstReadingUp = true;
   clearInterval(dataInterval);
+  win.webContents.send("resultValDown", 0);
+  win.webContents.send("resultValUp", 0);
   if (!client.destroyed) {
     client.destroy();
   }

@@ -103,6 +103,8 @@
             var series1 = new TimeSeries();
             var series2 = new TimeSeries();
 
+           
+
             // Create the chart
             var chart = new SmoothieChart({ 
                 labels: { fontSize: 15 },
@@ -111,6 +113,7 @@
                 timestampFormatter: SmoothieChart.timeFormatter,
                 maxValueScale: 1.2 
             });
+
 
             chart.addTimeSeries(series1, { lineWidth: 3, strokeStyle: '#00ff00', fillStyle: 'rgba(0, 255, 0, 0.4)' });
             chart.addTimeSeries(series2, { lineWidth: 3, strokeStyle: 'rgb(255, 0, 255)', fillStyle: 'rgba(255, 0, 255, 0.3)' });
