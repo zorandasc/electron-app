@@ -31,12 +31,14 @@ var receiveString;
 
 var timeInterval = 4;
 
-var firstReadingDown = true;
-var firstReadingUp = true;
+var wifiSelected;
+
+var firstReadDown = true;
+var firstReadUp = true;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 800,
+    width: 750,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
@@ -86,17 +88,21 @@ ipcMain.handle("connect", (event, ...args) => {
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle("disconnect", (event, ...args) => {
-  win.webContents.send("connect-result", "Connection closed.");
-  //console.log(...args);
+  
   isConnected = false;
-  firstReadingDown = true;
-  firstReadingUp = true;
+  firstReadDown = true;
+  firstReadUp = true;
+
   clearInterval(dataInterval);
-  win.webContents.send("resultValDown", 0);
-  win.webContents.send("resultValUp", 0);
+
   if (!client.destroyed) {
     client.destroy();
   }
+
+  win.webContents.send("connect-result", "Connection closed.");
+  win.webContents.send("resultValDown", 0);
+  win.webContents.send("resultValUp", 0);
+  
 });
 
 // ... do actions on behalf of the Renderer
@@ -105,18 +111,22 @@ ipcMain.handle("startGraf", (event, portNum, down, up) => {
   downDirection = down;
   upDirection = up;
 
-  firstReadingDown = true;
-  firstReadingUp = true;
+  portNum=Number(portNum)
+
+  wifiSelected=portNum
+
+  firstReadDown = true;
+  firstReadUp = true;
 
   console.log("STARTED.", downDirection, upDirection, portNum);
   //start new interval reading with choosen portnum
-  intervalPortStatistics(Number(portNum));
+  dataInterval=intervalPortStatistics(portNum);
 });
 
 ipcMain.handle("stopGraf", () => {
   //if firstreading true result=0
-  firstReadingDown = true;
-  firstReadingUp = true;
+  firstReadDown = true;
+  firstReadUp = true;
 
   //clear old loop interval
   clearInterval(dataInterval);
@@ -132,40 +142,50 @@ client.on("error", (arg) => {
 
 //na svaki interval ocitaj podatke
 client.on("data", function (data) {
-  //on connecting, if isConnected true skip this if
+  //on connecting, if isConnected true skip this if loop
+  var data=data.toString();
   if (!isConnected) {
-    var data = data.toString();
     isConnected = checkConnectStatus(data);
+    return
   }
+
+  //for gettting ssid name, but only at begginig of wifi reading
+  if((firstReadDown || firstReadUp) && wifiSelected==5 ){
+
+     var ssidPatern = data.match(/(?<=SSID \s\s+:\s)[a-z]+/g)
+     if(ssidPatern){
+       win.webContents.send("ssid", ssidPatern[0]);
+     }
+     console.log("SSIDIONJA JE:", ssidPatern)
+  }
+
   //EVERY timeInterval CALCULATE DOWNSTREAM if downDirection false do nothing
-  var transm = downDirection && data.toString().match(transmitString);
+  var transm = downDirection && data.match(transmitString);
   //result:  transm= null, null, [ '881213013905' ], null, null
   if (transm) {
     //[ '881213013905' ] Izvadi string i pretvoru u number
     newBajtDown = Number(transm[0]);
 
-    resultBRDown = firstReadingDown
-      ? 0
-      : calculateBitRate(newBajtDown, oldBajtDown);
+    resultBRDown = firstReadDown? 0: calculateBitRate(newBajtDown, oldBajtDown);
 
     oldBajtDown = newBajtDown;
 
-    firstReadingDown = false;
+    firstReadDown = false;
 
     win.webContents.send("resultValDown", resultBRDown);
   }
 
   //EVERY timeInterval CALCULATE UPSTREAM, if upDirection flase do notihing
-  var receiv = upDirection && data.toString().match(receiveString);
+  var receiv = upDirection && data.match(receiveString);
 
   if (receiv) {
     newBajtUp = Number(receiv[0]);
 
-    resultBRUp = firstReadingUp ? 0 : calculateBitRate(newBajtUp, oldBajtUp);
+    resultBRUp = firstReadUp ? 0 : calculateBitRate(newBajtUp, oldBajtUp);
 
     oldBajtUp = newBajtUp;
 
-    firstReadingUp = false;
+    firstReadUp = false;
 
     win.webContents.send("resultValUp", resultBRUp);
   }
@@ -205,17 +225,17 @@ function intervalPortStatistics(portNum) {
     //for wifi
     transmitString = /(?<=TotalBytesSent \s\s+:\s)\d+/g;
     receiveString = /(?<=TotalBytesReceived \s\s+:\s)\d+/g;
-    dataInterval = setInterval(() => {
-      client.write(`get wlan basic laninst 1 wlaninst 1\r\n`);
-    }, timeInterval * 1000);
+    var stringToWrite=`get wlan basic laninst 1 wlaninst 1\r\n`
+   
   } else {
     //for ethernet
     transmitString = /(?<=tx_byte_ok \s\s+:\s)\d+/g;
     receiveString = /(?<=rx_byte_ok \s\s+:\s)\d+/g;
-    dataInterval = setInterval(() => {
-      client.write(`display portstatistics portnum ${portNum}\r\n`);
-    }, timeInterval * 1000);
+    var stringToWrite=`display portstatistics portnum ${portNum}\r\n`
   }
+  return setInterval(() => {
+      client.write(stringToWrite);
+    }, timeInterval * 1000);
 }
 
 function calculateBitRate(newBajt, oldBajt) {

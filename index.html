@@ -18,7 +18,7 @@
                 <div class="form-group">
                     <textarea 
                         class="form-control" 
-                        id="ta" name="ta" rows="3" cols="40"
+                        id="ta" name="ta" rows="3" cols="50"
                         placeholder="Connection closed"
                         readonly></textarea>
                 </div>
@@ -47,15 +47,21 @@
             </div>
            
         </div>
+        
         <div class="dialog" id="dialog">
             <p>Sorry. Connection is closed.</p>
         </div>
-        <div class="window-content">       
-            <canvas id="mycanvas"  width="550" height="250"></canvas>      
+        <div class="window-content">  
+            <div id="ssid">
+            </div>
+            <canvas id="mycanvas"  width="600" height="250"></canvas>   
+            <p>[kbit/s]</p>   
         </div>
         <div class="tab-group">           
             <div class="tab-item active2" id="down" onclick="setDownUp('down')">
                 <p>DONSTREAM</p>
+                <p id="downMax">Max:</p>
+                <p id="downCurr">Curr</p>
             </div>
             <div class="tab-item" id="stop" onclick="stopGraf()">
                 <span class="icon icon-stop"></span>
@@ -67,6 +73,8 @@
             </div>
             <div class="tab-item active2" id="up" onclick="setDownUp('up')">
                 <p>UPSTREAM</p>
+                <p id="upMax">Max:</p>
+                <p id="upCurr">Curr:</p>
             </div>
             
             
@@ -83,6 +91,8 @@
             var up=true;
             var grafStarted=false;
             var connectionOpen=false;
+            var maxDown=0;
+            var maxUp=0;
 
             // Find the element
             var canvas = document.getElementById("mycanvas");
@@ -99,11 +109,17 @@
             var upBtn = document.getElementById("up")
 
             var dialog = document.getElementById("dialog")
+            var ssid = document.getElementById("ssid")
+
+            var downMaxHTML=document.getElementById("downMax")
+            var downCurr = document.getElementById("downCurr")
+
+            var upMaxHTML = document.getElementById("upMax")
+            var upCurr = document.getElementById("upCurr")
+
             // Create a time series
             var series1 = new TimeSeries();
             var series2 = new TimeSeries();
-
-           
 
             // Create the chart
             var chart = new SmoothieChart({ 
@@ -114,7 +130,6 @@
                 maxValueScale: 1.2 
             });
 
-
             chart.addTimeSeries(series1, { lineWidth: 3, strokeStyle: '#00ff00', fillStyle: 'rgba(0, 255, 0, 0.4)' });
             chart.addTimeSeries(series2, { lineWidth: 3, strokeStyle: 'rgb(255, 0, 255)', fillStyle: 'rgba(255, 0, 255, 0.3)' });
 
@@ -124,14 +139,18 @@
             //chart.stop();
 
             function getPortid(number){
+                
                 if(!grafStarted){
+                    //ako je graf nije startovan
                     //remove active sa starog elementa
                     document.getElementById(choosenPort).classList.remove("active")
+
                     choosenPort = number;
+        
                     //add active na novi element
                     document.getElementById(number).classList.add("active")
                 }
-                
+      
             }
 
             function setDownUp(direction){
@@ -146,14 +165,15 @@
                 }
             }
 
-            function connect(){
-                //posalji signal mainu za connect to host
+            //posalji signal mainu za connect to host
+            function connect(){ 
                 ipcRenderer.invoke('connect')    
             }
 
+            //posalji signal mainu za diskonect from host
             function disConnect() {
                 connectionOpen = false
-                //posalji signal mainu za diskonect from host
+                stopGraf()
                 ipcRenderer.invoke('disconnect') 
             }
 
@@ -176,9 +196,17 @@
             }
             
             function stopGraf() {
+                
                 start.style.display = "block"
                 stop.style.display = "none"
+
+                maxDown = 0;
+                maxUp = 0
+
+                ssid.style.transform = "translateY(-50px)"
+
                 grafStarted = false
+
                 ipcRenderer.invoke('stopGraf') 
             }
 
@@ -210,13 +238,31 @@
             ipcRenderer.on('resultValDown', function (event, arg) {              
                 var resultDown = Number(arg);
                 series1.append(Date.now(), resultDown);
+                if(resultDown > maxDown){
+                    maxDown=resultDown
+                }
+                downCurr.innerHTML= "Curr: "+ resultDown+" [kbit/s]"
+                downMaxHTML.innerHTML = "Max: " + maxDown + " [kbit/s]"
             })
 
             //rezultati dobijeni od maina unutar koje imaintervalna petlja
             ipcRenderer.on('resultValUp', function (event, arg) {
                 var resultUp = Number(arg);
                 series2.append(Date.now(), resultUp);
+                if (resultUp > maxUp) {
+                    maxUp = resultUp
+                }
+                upCurr.innerHTML = "Curr: " + resultUp + " [kbit/s]"
+                upMaxHTML.innerHTML = "Max: " + maxUp + " [kbit/s]"
             })
+            
+            //za dobijanje ssid name ali samo jednom tokomp prvog
+            ipcRenderer.on('ssid', function (event, arg) {
+                console.log(arg)
+                ssid.innerHTML="SSID: " + arg
+                ssid.style.transform="translateY(0px)"
+            })
+
            
     </script>
 </body>
