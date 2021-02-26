@@ -7,6 +7,9 @@ client.setEncoding("utf8");
 
 var win;
 var settingWin;
+
+let position;
+
 var dataInterval;
 
 var ipAdress = "192.168.100.1";
@@ -49,76 +52,86 @@ function createWindow() {
 
   win.loadFile("index.html");
 
-  win.on("closed", function(){
-    app.quit()
-  })
+  win.on("closed", function () {
+    app.quit();
+  });
+
+  //Tracking main window the
+  //settingWindow
+  win.on("move", function () {
+    position = win.getPosition();
+    console.log(position);
+  });
 
   //create menu
-  const mainMenu= Menu.buildFromTemplate(mainMenuTemplate)
-  Menu.setApplicationMenu(mainMenu)
+  const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+  Menu.setApplicationMenu(mainMenu);
 }
 
 //create settings window
-function createSettingsWindow(){
+function createSettingsWindow() {
   settingWin = new BrowserWindow({
     width: 400,
     height: 200,
-    title:"Connection Settings",
+    title: "Connection Settings",
+    alwaysOnTop: true,
+    parent: win,
+    modal: true,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
     },
   });
 
+  //set position of settwindow inside maniwindow
+  settingWin.setPosition(position[0] + 100, position[1] + 100);
+
   settingWin.loadFile("settings.html");
 
-  settingWin.on('close', function(){
-    settingWin=null
-  })
-
-}
-
-//Mneu template
-const mainMenuTemplate=[
-  {
-    label:"Connection Settings",
-    click(){
-      createSettingsWindow()
-    }
-  },
-  {
-    label:'Quit',
-    accelerator:process.platform=="darwin" ?"Command +Q":
-    "Ctrl+Q",
-    click(){
-      app.quit()
-    }
-  }
-]
-
-//optimizacija menu za macos, travis
-if(process.platform == "darwin"){
-  mainMenuTemplate.unshift({})
-}
-// Add developer tools option if in dev
-if(process.env.NODE_ENV !== 'production'){
-  mainMenuTemplate.push({
-    label: 'Developer Tools',
-    submenu:[
-      {
-        role: 'reload'
-      },
-      {
-        label: 'Toggle DevTools',
-        accelerator:process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
-        click(item, focusedWindow){
-          focusedWindow.toggleDevTools();
-        }
-      }
-    ]
+  settingWin.on("close", function () {
+    settingWin = null;
   });
 }
 
+//Mneu template
+const mainMenuTemplate = [
+  {
+    label: "Connection Settings",
+    click() {
+      createSettingsWindow();
+    },
+  },
+  {
+    label: "Quit",
+    accelerator: process.platform == "darwin" ? "Command +Q" : "Ctrl+Q",
+    click() {
+      app.quit();
+    },
+  },
+];
+
+//optimizacija menu za macos, travis
+if (process.platform == "darwin") {
+  mainMenuTemplate.unshift({});
+}
+// Add developer tools option if in dev
+if (process.env.NODE_ENV !== "production") {
+  mainMenuTemplate.push({
+    label: "Developer Tools",
+    submenu: [
+      {
+        role: "reload",
+      },
+      {
+        label: "Toggle DevTools",
+        accelerator: process.platform == "darwin" ? "Command+I" : "Ctrl+I",
+        click(item, focusedWindow) {
+          focusedWindow.toggleDevTools();
+        },
+      },
+    ],
+  });
+}
 
 app.whenReady().then(createWindow);
 
@@ -137,8 +150,6 @@ app.on("activate", () => {
     createWindow();
   }
 });
-
-
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
@@ -161,7 +172,6 @@ ipcMain.handle("connect", (event, ...args) => {
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle("disconnect", (event, ...args) => {
-  
   isConnected = false;
   firstReadDown = true;
   firstReadUp = true;
@@ -175,7 +185,6 @@ ipcMain.handle("disconnect", (event, ...args) => {
   win.webContents.send("connect-result", "Connection closed.");
   win.webContents.send("resultValDown", 0);
   win.webContents.send("resultValUp", 0);
-  
 });
 
 // ... do actions on behalf of the Renderer
@@ -184,16 +193,16 @@ ipcMain.handle("startGraf", (event, portNum, down, up) => {
   downDirection = down;
   upDirection = up;
 
-  portNum=Number(portNum)
+  portNum = Number(portNum);
 
-  wifiSelected=portNum
+  wifiSelected = portNum;
 
   firstReadDown = true;
   firstReadUp = true;
 
   console.log("STARTED.", downDirection, upDirection, portNum);
   //start new interval reading with choosen portnum
-  dataInterval=intervalPortStatistics(portNum);
+  dataInterval = intervalPortStatistics(portNum);
 });
 
 ipcMain.handle("stopGraf", () => {
@@ -208,9 +217,9 @@ ipcMain.handle("stopGraf", () => {
   console.log("STOPED");
 });
 
-ipcMain.handle("settings",(ip, username, password)=>{
-  console.log("kurec ",ip, username, password)
-})
+ipcMain.handle("settings", (ip, username, password) => {
+  console.log("kurec ", ip, username, password);
+});
 
 client.on("error", (arg) => {
   console.log("ERORRONJA", arg);
@@ -220,20 +229,19 @@ client.on("error", (arg) => {
 //na svaki interval ocitaj podatke
 client.on("data", function (data) {
   //on connecting, if isConnected true skip this if loop
-  var data=data.toString();
+  var data = data.toString();
   if (!isConnected) {
     isConnected = checkConnectStatus(data);
-    return
+    return;
   }
 
   //for gettting ssid name, but only at begginig of wifi reading
-  if((firstReadDown || firstReadUp) && wifiSelected==5 ){
-
-     var ssidPatern = data.match(/(?<=SSID \s\s+:\s)[a-z]+/g)
-     if(ssidPatern){
-       win.webContents.send("ssid", ssidPatern[0]);
-     }
-     console.log("SSIDIONJA JE:", ssidPatern)
+  if ((firstReadDown || firstReadUp) && wifiSelected == 5) {
+    var ssidPatern = data.match(/(?<=SSID \s\s+:\s)[a-z]+/g);
+    if (ssidPatern) {
+      win.webContents.send("ssid", ssidPatern[0]);
+    }
+    console.log("SSIDIONJA JE:", ssidPatern);
   }
 
   //EVERY timeInterval CALCULATE DOWNSTREAM if downDirection false do nothing
@@ -243,7 +251,9 @@ client.on("data", function (data) {
     //[ '881213013905' ] Izvadi string i pretvoru u number
     newBajtDown = Number(transm[0]);
 
-    resultBRDown = firstReadDown? 0: calculateBitRate(newBajtDown, oldBajtDown);
+    resultBRDown = firstReadDown
+      ? 0
+      : calculateBitRate(newBajtDown, oldBajtDown);
 
     oldBajtDown = newBajtDown;
 
@@ -302,17 +312,16 @@ function intervalPortStatistics(portNum) {
     //for wifi
     transmitString = /(?<=TotalBytesSent \s\s+:\s)\d+/g;
     receiveString = /(?<=TotalBytesReceived \s\s+:\s)\d+/g;
-    var stringToWrite=`get wlan basic laninst 1 wlaninst 1\r\n`
-   
+    var stringToWrite = `get wlan basic laninst 1 wlaninst 1\r\n`;
   } else {
     //for ethernet
     transmitString = /(?<=tx_byte_ok \s\s+:\s)\d+/g;
     receiveString = /(?<=rx_byte_ok \s\s+:\s)\d+/g;
-    var stringToWrite=`display portstatistics portnum ${portNum}\r\n`
+    var stringToWrite = `display portstatistics portnum ${portNum}\r\n`;
   }
   return setInterval(() => {
-      client.write(stringToWrite);
-    }, timeInterval * 1000);
+    client.write(stringToWrite);
+  }, timeInterval * 1000);
 }
 
 function calculateBitRate(newBajt, oldBajt) {
