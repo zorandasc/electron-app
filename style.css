@@ -48,6 +48,7 @@ div.smoothie-chart-tooltip {
 }
 .tab-group {
   border: none;
+  min-height: 2.5rem;
 }
 
 .tab-item {
@@ -99,6 +100,7 @@ div.smoothie-chart-tooltip {
   align-items: center;
   background: rgb(26, 33, 34);
   position: relative;
+  min-height: 280px;
 }
 .window-content p {
   color: rgb(234, 235, 235);

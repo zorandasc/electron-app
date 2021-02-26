@@ -38,7 +38,7 @@ var firstReadUp = true;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 750,
+    width: 700,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
