@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 var net = require("net");
 
 var client = new net.Socket();
@@ -6,6 +6,7 @@ var client = new net.Socket();
 client.setEncoding("utf8");
 
 var win;
+var settingWin;
 var dataInterval;
 
 var ipAdress = "192.168.100.1";
@@ -47,7 +48,77 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
+
+  win.on("closed", function(){
+    app.quit()
+  })
+
+  //create menu
+  const mainMenu= Menu.buildFromTemplate(mainMenuTemplate)
+  Menu.setApplicationMenu(mainMenu)
 }
+
+//create settings window
+function createSettingsWindow(){
+  settingWin = new BrowserWindow({
+    width: 400,
+    height: 200,
+    title:"Connection Settings",
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+    },
+  });
+
+  settingWin.loadFile("settings.html");
+
+  settingWin.on('close', function(){
+    settingWin=null
+  })
+
+}
+
+//Mneu template
+const mainMenuTemplate=[
+  {
+    label:"Connection Settings",
+    click(){
+      createSettingsWindow()
+    }
+  },
+  {
+    label:'Quit',
+    accelerator:process.platform=="darwin" ?"Command +Q":
+    "Ctrl+Q",
+    click(){
+      app.quit()
+    }
+  }
+]
+
+//optimizacija menu za macos, travis
+if(process.platform == "darwin"){
+  mainMenuTemplate.unshift({})
+}
+// Add developer tools option if in dev
+if(process.env.NODE_ENV !== 'production'){
+  mainMenuTemplate.push({
+    label: 'Developer Tools',
+    submenu:[
+      {
+        role: 'reload'
+      },
+      {
+        label: 'Toggle DevTools',
+        accelerator:process.platform == 'darwin' ? 'Command+I' : 'Ctrl+I',
+        click(item, focusedWindow){
+          focusedWindow.toggleDevTools();
+        }
+      }
+    ]
+  });
+}
+
 
 app.whenReady().then(createWindow);
 
@@ -66,6 +137,8 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
@@ -134,6 +207,10 @@ ipcMain.handle("stopGraf", () => {
   win.webContents.send("resultValUp", 0);
   console.log("STOPED");
 });
+
+ipcMain.handle("settings",(ip, username, password)=>{
+  console.log("kurec ",ip, username, password)
+})
 
 client.on("error", (arg) => {
   console.log("ERORRONJA", arg);
