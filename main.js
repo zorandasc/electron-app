@@ -8,7 +8,7 @@ client.setEncoding("utf8");
 var win;
 var settingWin;
 
-let position;
+let position = [0, 0];
 
 var dataInterval;
 
@@ -56,8 +56,11 @@ function createWindow() {
     app.quit();
   });
 
-  //Tracking main window the
+  //Tracking main window for the
   //settingWindow
+  //ovo na pocetku dok miruje
+  position = win.getPosition();
+  //ovo dok se krece
   win.on("move", function () {
     position = win.getPosition();
     console.log(position);
