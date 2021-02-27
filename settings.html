@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="./css/photon.css">
+    <link rel="stylesheet" href="./settingStyle.css">
     <title>Connection Settings</title>
 </head>
 <body>
     <form id="form" >
-        <div>
-            <label for="ip">IP Addresss</label>
-            <input type="text" id="ip" name="ip" autofocus>
+        <div class="container">
+            <div class="tcp">
+                <label for="ip">IP Addresss</label>
+                <input type="text" id="ip" name="ip" autofocus>
+                <label for="port">Port</label>
+                <input type="number" id="port" name="port" width="1rem">
+            </div>
             <label for="username">Username</label>
             <input type="text" id="username" name="username" autofocus>
             <label for="password">Password</label>
             <input type="text" id="password" name="password" autofocus>
         </div>
-        <button type="submit">Set</button>
+        <button type="submit" class="btn save">Save</button>
     </form>
     <script defer>
         const { ipcRenderer } = require('electron')
@@ -26,11 +32,13 @@
         function submitFunction(e){
             //stop submit to file
             e.preventDefault();
-            const ip = document.getElementById("ip")
-            const username = document.getElementById("username")
-            const password = document.getElementById("password")
+           
+            const ip = document.getElementById("ip").value
+            const username = document.getElementById("username").value
+            const password = document.getElementById("password").value
             
             ipcRenderer.invoke("settings", ip, username, password)
+            
         }
     </script>
 </body>

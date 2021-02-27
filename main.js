@@ -63,7 +63,7 @@ function createWindow() {
   //ovo dok se krece
   win.on("move", function () {
     position = win.getPosition();
-    console.log(position);
+    //console.log(position);
   });
 
   //create menu
@@ -74,22 +74,29 @@ function createWindow() {
 //create settings window
 function createSettingsWindow() {
   settingWin = new BrowserWindow({
-    width: 400,
-    height: 200,
+    width: 450,
+    height: 300,
     title: "Connection Settings",
     alwaysOnTop: true,
     parent: win,
     modal: true,
+    frame:false,
+    transparent:true,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
     },
+    
   });
 
   //set position of settwindow inside maniwindow
   settingWin.setPosition(position[0] + 100, position[1] + 100);
 
   settingWin.loadFile("settings.html");
+
+  settingWin.once('ready-to-show', () => {
+  settingWin.show()
+  })
 
   settingWin.on("close", function () {
     settingWin = null;
@@ -220,8 +227,10 @@ ipcMain.handle("stopGraf", () => {
   console.log("STOPED");
 });
 
-ipcMain.handle("settings", (ip, username, password) => {
+//vhe changing connect parametars
+ipcMain.handle("settings", (event, ip, username, password) => {
   console.log("kurec ", ip, username, password);
+  settingWin.close()
 });
 
 client.on("error", (arg) => {
