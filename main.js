@@ -80,7 +80,7 @@ function createSettingsWindow() {
     alwaysOnTop: true,
     parent: win,
     modal: true,
-    //frame: false,
+    frame: false,
     transparent: true,
     webPreferences: {
       nodeIntegration: true,
@@ -229,7 +229,7 @@ ipcMain.handle("stopGraf", () => {
 //vhe changing connect parametars
 ipcMain.handle("settings", (event, ip, protocol, username, password) => {
   console.log("kurec ", ip, protocol, username, password);
-  //settingWin.close();
+  settingWin.close();
 });
 
 client.on("error", (arg) => {

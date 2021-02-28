@@ -41,8 +41,12 @@
         console.log('File used for Persisting Data - ' +
                 settings.file()); 
 
-        settings.get('key.data').then(value => {
-                console.log('Persisted Value - ' + value);
+        settings.get('key').then(data => {
+            ip.value=data.strIp
+            protocol.value=data.strProtocol
+            username.value=data.strUsername
+            password.value=data.strPassword
+            console.log('Persisted Value - ' + data);
             }) 
 
         const form=document.getElementById("form")
@@ -56,9 +60,8 @@
         function submitFunction(e){
             //stop submit to file
             e.preventDefault();
-            settings.set('key', {
-                data: ip.value
-            }); 
+            console.log('Sample Text Entered - ' + ip.value); 
+            settings.setSync('key', {strIp: ip.value, strProtocol:protocol.value, strUsername: username.value, strPassword: password.value}); 
             ipcRenderer.invoke("settings", ip.value, protocol.value, username.value, password.value)
             
         }
