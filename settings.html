@@ -10,35 +10,61 @@
 <body>
     <form id="form" >
         <div class="container">
-            <div class="tcp">
+            <div class="form-group">
                 <label for="ip">IP Addresss</label>
-                <input type="text" id="ip" name="ip" autofocus>
-                <label for="port">Port</label>
-                <input type="number" id="port" name="port" width="1rem">
+                <input type="text" id="ip" name="ip" autofocus >
             </div>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" autofocus>
-            <label for="password">Password</label>
-            <input type="text" id="password" name="password" autofocus>
+            <div class="form-group">
+                <label for="protocol">Protocol</label>
+                <select type="number" id="protocol" name="protocol" >
+                    <option value="23">Telnet</option>
+                    <option value="22">SSH</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username"  >
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="text" id="password" name="password" autofocus >
+            </div>
         </div>
+        <button type="button" onclick="clearFields()" class="btn  save clear">Clear</button>
         <button type="submit" class="btn save">Save</button>
+        <p>*If the field is blank, the default will be used.</p>
     </form>
     <script defer>
         const { ipcRenderer } = require('electron')
+        const settings = require('electron-settings'); 
+
+        console.log('File used for Persisting Data - ' +
+                settings.file()); 
+
+        settings.get('key.data').then(value => {
+                console.log('Persisted Value - ' + value);
+            }) 
 
         const form=document.getElementById("form")
+        const ip = document.getElementById("ip")
+        const username = document.getElementById("username")
+        const password = document.getElementById("password")
+        const protocol= document.getElementById("protocol")
+
         form.addEventListener("submit", submitFunction)
 
         function submitFunction(e){
             //stop submit to file
             e.preventDefault();
-           
-            const ip = document.getElementById("ip").value
-            const username = document.getElementById("username").value
-            const password = document.getElementById("password").value
+            settings.set('key', {
+                data: ip.value
+            }); 
+            ipcRenderer.invoke("settings", ip.value, protocol.value, username.value, password.value)
             
-            ipcRenderer.invoke("settings", ip, username, password)
-            
+        }
+
+        function clearFields(){
+            form.reset()
         }
     </script>
 </body>
