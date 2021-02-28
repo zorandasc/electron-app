@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 var net = require("net");
+const settings = require('electron-settings'); 
 
 var client = new net.Socket();
 
@@ -10,14 +11,14 @@ var settingWin;
 
 let position = [0, 0];
 
-var dataInterval;
-
-var ipAdress = "192.168.100.1";
-var port = "23";
-var username = "root";
-var password = "admin";
+var defIpAdress = "192.168.100.1";
+var defProtocol = "23";
+var defUsername = "root";
+var defPassword = "admin";
 
 var isConnected = false;
+
+var dataInterval;
 
 var downDirection = true;
 var upDirection = true;
@@ -162,21 +163,32 @@ app.on("activate", () => {
 
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
-  //connect to client
-  client.connect(port, ipAdress, () => {
-    client.write(`${username}\r\n`);
-    setTimeout(() => {
-      client.write(`${password}\r\n`);
-      client.setTimeout(0);
-    }, 2000);
-  });
 
-  //ovo je bitno ako je npr. pogrsna ip adrsesa
-  if (client.connecting) {
-    win.webContents.send("connect-result", "Conecting....");
-    //setuj time out na 9 sekundi =>ovo  ce nas odvesti nakon 9s na ontimeuout listener
-    client.setTimeout(9000);
-  }
+  //first get the stored setting if it has any
+  settings.get('key').then(data => {
+    var newIpAdress=data.strIp?data.strIp:defIpAdress
+    var newProtocol=data.strProtocol?data.strProtocol:defProtocol
+    var newUsername=data.strUsername?data.strUsername:defUsername
+    var newPassword=data.strPassword?data.strPassword:defPassword
+
+    //console.log(newIpAdress,newProtocol,newUsername,newPassword )
+
+     //and then try to connect connect to client
+    client.connect(newProtocol, newIpAdress, () => {
+      client.write(`${newUsername}\r\n`);
+      setTimeout(() => {
+        client.write(`${newPassword}\r\n`);
+        client.setTimeout(0);
+      }, 2000);
+    }); 
+    
+    //ovo je bitno ako je npr. pogrsna ip adrsesa
+    if (client.connecting) {
+      win.webContents.send("connect-result", "Conecting....");
+      //setuj time out na 9 sekundi =>ovo  ce nas odvesti nakon 9s na ontimeuout listener
+      client.setTimeout(9000);
+    }
+  }) 
 });
 
 // ... do actions on behalf of the Renderer
@@ -341,3 +353,7 @@ function calculateBitRate(newBajt, oldBajt) {
   result = result / 1000; //kbits/s
   return result;
 }
+
+
+console.log("process.env.ELECTRON_WEBPACK_APP_USERNAME",
+process.env.ELECTRON_WEBPACK_APP_USERNAME)
