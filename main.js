@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 var net = require("net");
 const settings = require('electron-settings'); 
+require('dotenv').config()
 
 var client = new net.Socket();
 
@@ -13,8 +14,8 @@ let position = [0, 0];
 
 var defIpAdress = "192.168.100.1";
 var defProtocol = "23";
-var defUsername = "root";
-var defPassword = "admin";
+var defUsername = process.env.DEFUSERNAME;
+var defPassword = process.env.DEFPASSWORD;
 
 var isConnected = false;
 
@@ -353,7 +354,3 @@ function calculateBitRate(newBajt, oldBajt) {
   result = result / 1000; //kbits/s
   return result;
 }
-
-
-console.log("process.env.ELECTRON_WEBPACK_APP_USERNAME",
-process.env.ELECTRON_WEBPACK_APP_USERNAME)
