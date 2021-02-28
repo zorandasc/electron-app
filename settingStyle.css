@@ -71,3 +71,31 @@ button:active {
   background-color: rgb(228, 100, 37);
   color: rgb(36, 44, 46, 0.6);
 }
+
+.dialog {
+  position: fixed;
+  top: 30%;
+  left: 0;
+  background: rgb(228, 100, 37, 0.8);
+  z-index: 10;
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.dialog h3 {
+  color: rgb(234, 235, 235);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+}
+
+#dialogBtn {
+  cursor: pointer;
+  float: right;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: rgb(234, 235, 235);
+  margin-bottom: 0.5rem;
+}

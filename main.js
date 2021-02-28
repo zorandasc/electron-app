@@ -3,9 +3,10 @@ var net = require("net");
 const settings = require('electron-settings'); 
 require('dotenv').config()
 
-var client = new net.Socket();
+var key= process.env.MY_SECRET_KEY;
+// Create an encryptor:
+var encryptor = require('simple-encryptor')(key);
 
-client.setEncoding("utf8");
 
 var win;
 var settingWin;
@@ -41,6 +42,7 @@ var wifiSelected;
 
 var firstReadDown = true;
 var firstReadUp = true;
+
 
 function createWindow() {
   win = new BrowserWindow({
@@ -162,19 +164,26 @@ app.on("activate", () => {
   }
 });
 
+var client = new net.Socket();
+
+client.setEncoding("utf8");
+
+
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
 
   //first get the stored setting if it has any
   settings.get('key').then(data => {
-    var newIpAdress=data.strIp?data.strIp:defIpAdress
-    var newProtocol=data.strProtocol?data.strProtocol:defProtocol
-    var newUsername=data.strUsername?data.strUsername:defUsername
-    var newPassword=data.strPassword?data.strPassword:defPassword
+    var {strIp,strProtocol,strUsername,strPassword}=data
+
+    var newIpAdress=strIp?strIp:defIpAdress
+    var newProtocol=strProtocol?strProtocol:defProtocol
+    var newUsername=strUsername?encryptor.decrypt(strUsername):defUsername
+    var newPassword=strPassword?encryptor.decrypt(strPassword):defPassword
 
     //console.log(newIpAdress,newProtocol,newUsername,newPassword )
 
-     //and then try to connect connect to client
+     //and then try to connect to client
     client.connect(newProtocol, newIpAdress, () => {
       client.write(`${newUsername}\r\n`);
       setTimeout(() => {
@@ -239,9 +248,8 @@ ipcMain.handle("stopGraf", () => {
   console.log("STOPED");
 });
 
-//vhe changing connect parametars
-ipcMain.handle("settings", (event, ip, protocol, username, password) => {
-  console.log("kurec ", ip, protocol, username, password);
+//close settingwindow
+ipcMain.handle("settings", () => {
   settingWin.close();
 });
 
