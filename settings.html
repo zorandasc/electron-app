@@ -107,6 +107,7 @@
 
         //clear button ne zatvara settings window, wec mora save
         function clearFields(){
+            closeDialog()
             form.reset()
         }
 
@@ -116,7 +117,7 @@
                 return (true)
             }
             //ako je false pokazi dialog
-            dialog.style.transform = "translateX(0)"
+            dialog.style.transform = "translateX(5px)"
             return (false)
         }
 
