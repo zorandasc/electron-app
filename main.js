@@ -269,7 +269,6 @@ client.on("data", function (data) {
 
   //for gettting ssid name, but only at begginig of wifi reading
   if ((firstReadDown || firstReadUp) && wifiSelected == 5) {
-    console.log('DATONJA', data)
     //(:?^|\s)nothing in front, regexp-lookahead-lookbehind <=operater
     //uzmi sve alafnumerice [a-z0-9] iza (:?^|\s)SSID\s\s+:\s) paterna
     var ssidPatern = data.match(/(?<=(:?^|\s)SSID\s\s+:\s)[a-z0-9]+/g);
