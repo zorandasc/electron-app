@@ -145,3 +145,47 @@ div.smoothie-chart-tooltip {
   transition: transform 0.5s;
   transform: translateY(-50px);
 }
+
+.krugovi {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 8rem;
+  height: 50%;
+}
+
+.svg-wrapper {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 164px;
+}
+.shape {
+  stroke-dasharray: 0 540;
+  stroke-dashoffset: -474;
+  stroke-width: 1px;
+  stroke: #19f6e8;
+  border-radius: 100%;
+  transition: stroke-width 1s, stroke-dashoffset 1s, stroke-dasharray 1s;
+}
+.text {
+  font-family: "Roboto Condensed";
+  font-size: 22px;
+  line-height: 164px;
+  letter-spacing: 8px;
+  height: 164px;
+  color: #fff;
+  top: 0;
+  position: absolute;
+  left: 0;
+  width: 164px;
+  text-align: center;
+}
+.svg-wrapper:hover .shape {
+  stroke-width: 2px;
+  stroke-dashoffset: 0;
+  stroke-dasharray: 760;
+  border-radius: 100%;
+}
