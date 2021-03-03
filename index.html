@@ -52,25 +52,24 @@
             <p>Sorry. Connection is closed.</p>
         </div>
         <div class="window-content"> 
-            <div class="krugovi">
-                <div class="svg-wrapper">
-                    <svg height="166" width="166" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="83" cy="83" r="41" class="shape" height="166" width="166"></circle>
-                        <div class="text">down</div>
-                    </svg>
-                </div>
-                <div class="svg-wrapper">
-                    <svg height="166" width="166" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="83" cy="83" r="41" class="shape" height="166" width="166"></circle>
-                        <div class="text">up</div>
-                    </svg>
-                </div>
-            </div> 
-            
             <div id="ssid">
             </div>
             <canvas id="mycanvas"  width="600" height="250"></canvas>   
-            <p>[kbit/s]</p>   
+            <div class="krugovi">
+                <div class="svg-wrapper">
+                    <svg height="125" width="100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="70" r="31" class="shape" height="166" width="166"></circle>
+                        <div class="text" >down</div>
+                    </svg>
+                </div>
+                Max:[Mbit/s]
+                <div class="svg-wrapper">
+                    <svg height="125" width="100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="70" r="31" class="shape" height="166" width="166"></circle>
+                        <div class="text"  >up</div>
+                    </svg>
+                </div>
+            </div>
         </div>
         <div class="tab-group">           
             <div class="tab-item active2" id="down" onclick="setDownUp('down')">

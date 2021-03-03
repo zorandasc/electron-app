@@ -254,6 +254,8 @@ ipcMain.handle("settings", () => {
 });
 
 client.on("error", (arg) => {
+  var message = arg.toString().match(/(?<=(:?^|\s)Error:\s).*$/g);
+  win.webContents.send("connect-result", message);
   console.log("ERORRONJA", arg);
   client.destroy();
 });
