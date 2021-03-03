@@ -23,16 +23,16 @@ div.smoothie-chart-tooltip {
 
 .toolbar-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   padding-top: 0.5rem;
 }
 
 .toolbar-actions .btn-positive {
-  float: left;
+  margin: 1rem 2rem;
   cursor: pointer;
   background: none;
-  padding: 0.5rem;
+  padding: 1rem;
   border-color: rgb(228, 100, 37);
   color: rgb(228, 100, 37);
   font-size: 20px;
@@ -53,12 +53,14 @@ div.smoothie-chart-tooltip {
   display: none;
 }
 
-.form-group textarea {
+.toolbar-actions textarea {
+  display: block;
   background-color: rgb(36, 44, 46);
   color: rgb(245, 87, 111);
   letter-spacing: 2px;
+  margin: 1rem 2rem;
 }
-.form-group textarea::placeholder {
+textarea::placeholder {
   color: lightblue;
   letter-spacing: 2px;
 }
