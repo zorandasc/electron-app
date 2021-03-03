@@ -1,9 +1,18 @@
+.menubar-menu-button {
+  color: rgb(234, 235, 235);
+  letter-spacing: 2px;
+}
+.window-title {
+  color: rgb(234, 235, 235);
+  font-size: 16px;
+}
+
 div.smoothie-chart-tooltip {
   background: #444;
   padding: 1em;
   margin-top: 20px;
   font-family: consolas;
-  color: white;
+  color: rgb(234, 235, 235);
   font-size: 14px;
   pointer-events: none;
 }
@@ -20,6 +29,7 @@ div.smoothie-chart-tooltip {
 }
 
 .toolbar-actions .btn-positive {
+  float: left;
   cursor: pointer;
   background: none;
   padding: 0.5rem;
@@ -27,6 +37,16 @@ div.smoothie-chart-tooltip {
   color: rgb(228, 100, 37);
   font-size: 20px;
   letter-spacing: 2px;
+  box-shadow: 0 0 10px rgb(228, 100, 37);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px;
+  }
+  to {
+    box-shadow: 0 0 30px;
+  }
 }
 
 #discntBtn {
@@ -84,17 +104,8 @@ div.smoothie-chart-tooltip {
   border: 1px solid rgba(0, 0, 0, 0.01);
 }
 
-.tab-item.active2 {
-  color: rgb(234, 235, 235);
-
-  box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.6),
-    inset -4px -4px 6px -1px rgba(119, 123, 123, 0.7),
-    -0.5px -0.5px 0px rgba(119, 123, 123, 1),
-    0.5px 0.5px 0px rgba(0, 0, 0, 0.15), 0px 12px 10px -10px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.01);
-}
-
 .window-content {
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -107,9 +118,6 @@ div.smoothie-chart-tooltip {
   padding-left: 1rem;
 }
 
-#stop {
-  display: none;
-}
 #down {
   color: lightgreen;
 }
@@ -198,4 +206,14 @@ div.smoothie-chart-tooltip {
     stroke-dasharray: 760;
     stroke-dashoffset: 0;
   }
+}
+
+.control {
+  height: 3rem;
+}
+
+.control .tab-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

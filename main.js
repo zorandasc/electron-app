@@ -1,11 +1,13 @@
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 var net = require("net");
 const settings = require('electron-settings'); 
-require('dotenv').config()
+require('dotenv').config();
 
 var key= process.env.MY_SECRET_KEY;
 // Create an encryptor:
 var encryptor = require('simple-encryptor')(key);
+
+
 
 
 var win;
@@ -46,8 +48,10 @@ var firstReadUp = true;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 700,
-    height: 600,
+    width: 720,
+    height: 550,
+    frame:false,
+    titleBarStyle: "hidden", 
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,

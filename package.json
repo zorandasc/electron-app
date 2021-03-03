@@ -13,6 +13,7 @@
     "electron": "^11.2.3"
   },
   "dependencies": {
+    "custom-electron-titlebar": "^3.2.6",
     "dotenv": "^8.2.0",
     "electron-settings": "^4.0.2",
     "simple-encryptor": "^4.0.0"

@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>RGW Monitoring Application</title>
+    <title>RGW Monitoring</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link rel="stylesheet" href="./css/photon.css">
     <link rel="stylesheet" href="style.css">
@@ -56,42 +56,32 @@
             </div>
             <canvas id="mycanvas"  width="600" height="250"></canvas>   
             <div class="krugovi">
-                <div class="svg-wrapper">
+                <div class="svg-wrapper" id="down" onclick="setDownUp('down')">
                     <svg height="125" width="100" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="50" cy="70" r="31" class="shape" height="166" width="166"></circle>
-                        <div class="text" >down</div>
+                        <div class="text" id="downMax">down</div>
                     </svg>
                 </div>
                 Max:[Mbit/s]
-                <div class="svg-wrapper">
+                <div class="svg-wrapper" id="up" onclick="setDownUp('up')">
                     <svg height="125" width="100" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="50" cy="70" r="31" class="shape" height="166" width="166"></circle>
-                        <div class="text"  >up</div>
+                        <div class="text" id="upMax">up</div>
                     </svg>
                 </div>
             </div>
         </div>
-        <div class="tab-group">           
-            <div class="tab-item active2" id="down" onclick="setDownUp('down')">
-                <p>DONSTREAM</p>
-                <p id="downMax">Max:</p>
-                <p id="downCurr">Curr:</p>
-            </div>
-            <div class="tab-item" id="stop" onclick="stopGraf()">
+        <div class="tab-group control">           
+            <div class="tab-item active" id="stop" onclick="stopGraf()" >
                 <span class="icon icon-stop"></span>
-                <p>STOP</p>
+               
             </div>
             <div class="tab-item" id="start" onclick="startGraf()">
                 <span class="icon icon-play"></span>
-                <p>START</p>
             </div>
-            <div class="tab-item active2" id="up" onclick="setDownUp('up')">
-                <p>UPSTREAM</p>
-                <p id="upMax">Max:</p>
-                <p id="upCurr">Curr:</p>
+            <div class="tab-item" id="record">   
+                <span class="icon icon-record"></span>
             </div>
-            
-            
         </div>
     </div>
   
@@ -99,7 +89,13 @@
     <script type="text/javascript" src="smoothie.js"></script>
     <script defer>
             const { ipcRenderer } = require('electron')
-           
+            const customTitlebar = require('custom-electron-titlebar');
+
+            var titleBar=new customTitlebar.Titlebar({
+                backgroundColor: customTitlebar.Color.fromHex('#e46425'),
+                overflow:'hidden'
+            });
+
             var choosenPort =5;
             var down=true;
             var up=true;
@@ -126,10 +122,7 @@
             var ssid = document.getElementById("ssid")
 
             var downMaxHTML=document.getElementById("downMax")
-            var downCurr = document.getElementById("downCurr")
-
             var upMaxHTML = document.getElementById("upMax")
-            var upCurr = document.getElementById("upCurr")
 
             // Create a time series
             var series1 = new TimeSeries();
@@ -195,12 +188,12 @@
             //vrijednosti 
             function startGraf(){
                 if(connectionOpen){
-                    start.style.display="none"
-                    stop.style.display="block"
-                    stop.classList.add("active2") 
+                    start.classList.add("active") 
+                    stop.classList.remove("active") 
                     grafStarted=true
                     ipcRenderer.invoke('startGraf', choosenPort, down,up) 
                 } else {
+                    //elese pokazi dijalog
                     dialog.style.transform = "translateX(1rem)"
                     setTimeout(()=>{
                         dialog.style.transform= "translateX(-12rem)"
@@ -211,9 +204,8 @@
             
             function stopGraf() {
                 
-                start.style.display = "block"
-                stop.style.display = "none"
-
+                stop.classList.add("active")
+                start.classList.remove("active") 
                 maxDown = 0;
                 maxUp = 0
 
@@ -255,8 +247,7 @@
                 if(resultDown > maxDown){
                     maxDown=resultDown
                 }
-                downCurr.innerHTML= "Curr: "+ resultDown+" [kbit/s]"
-                downMaxHTML.innerHTML = "Max: " + maxDown + " [kbit/s]"
+                downMaxHTML.innerHTML = maxDown
             })
 
             //rezultati dobijeni od maina unutar koje imaintervalna petlja
@@ -266,8 +257,7 @@
                 if (resultUp > maxUp) {
                     maxUp = resultUp
                 }
-                upCurr.innerHTML = "Curr: " + resultUp + " [kbit/s]"
-                upMaxHTML.innerHTML = "Max: " + maxUp + " [kbit/s]"
+                upMaxHTML.innerHTML = maxUp
             })
             
             //za dobijanje ssid name ali samo jednom tokomp prvog
