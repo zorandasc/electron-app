@@ -32,7 +32,7 @@ div.smoothie-chart-tooltip {
   margin: 1rem 2rem;
   cursor: pointer;
   background: none;
-  padding: 1rem;
+  padding: 0.5rem;
   border-color: rgb(228, 100, 37);
   color: rgb(228, 100, 37);
   font-size: 20px;
@@ -105,6 +105,13 @@ textarea::placeholder {
     0.5px 0.5px 0px rgba(0, 0, 0, 0.15), 0px 12px 10px -10px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.01);
 }
+.active2 {
+  box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.6),
+    inset -4px -4px 6px -1px rgba(119, 123, 123, 0.7),
+    -0.5px -0.5px 0px rgba(119, 123, 123, 1),
+    0.5px 0.5px 0px rgba(0, 0, 0, 0.15), 0px 12px 10px -10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.01);
+}
 
 .window-content {
   overflow: hidden;
@@ -155,8 +162,16 @@ textarea::placeholder {
   transition: transform 0.5s;
   transform: translateY(-50px);
 }
+.max {
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
 .krugovi {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -164,32 +179,51 @@ textarea::placeholder {
   height: 250px;
   color: #444;
 }
+.mjerna {
+  color: rgb(234, 235, 235);
+  position: absolute;
+  letter-spacing: 2px;
+  top: -1rem;
+  right: 2rem;
+}
+.max {
+  color: rgb(234, 235, 235);
+  position: absolute;
+  letter-spacing: 2px;
+  left: 1rem;
+}
 
 .svg-wrapper {
+  z-index: 100;
   position: relative;
-  width: 100px;
+  width: 80px;
+  height: 80px;
+  margin: 1rem 0;
+  margin-left: 1rem;
 }
 .shape {
-  stroke: #19f6e8;
   border-radius: 100%;
   transition: stroke-width 1s, stroke-dashoffset 1s, stroke-dasharray 1s;
-
   border-radius: 100%;
-
   animation: kurac 3s infinite;
 }
-.text {
+.textCircleDown,
+.textCircleUp {
+  cursor: pointer;
   font-family: consolas;
   font-size: 12px;
-  line-height: 140px;
+  line-height: 80px;
   letter-spacing: 2px;
   height: 125px;
   color: #fff;
   top: 0;
   position: absolute;
   left: 0;
-  width: 100px;
+  width: 80px;
   text-align: center;
+}
+.textCircleUp {
+  line-height: 80px;
 }
 
 @keyframes kurac {

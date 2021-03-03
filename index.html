@@ -56,19 +56,21 @@
             </div>
             <canvas id="mycanvas"  width="600" height="250"></canvas>   
             <div class="krugovi">
-                <div class="svg-wrapper" id="down" onclick="setDownUp('down')">
-                    <svg height="125" width="100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="70" r="31" class="shape" height="166" width="166"></circle>
-                        <div class="text" id="downMax">down</div>
+                <p class="mjerna">[Mbit/s]</p>
+                <div class="svg-wrapper active2" id="down" onclick="setDownUp('down')">
+                    <svg height="80" width="80" stroke="lightgreen" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="38" cy="38" r="30" class="shape"  height="166" width="166"></circle>
+                        <div class="textCircleDown" id="downMax">Down</div>
                     </svg>
                 </div>
-                Max:[Mbit/s]
-                <div class="svg-wrapper" id="up" onclick="setDownUp('up')">
-                    <svg height="125" width="100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="70" r="31" class="shape" height="166" width="166"></circle>
-                        <div class="text" id="upMax">up</div>
+                <p class="max">Max:</p>
+                <div class="svg-wrapper active2" id="up" onclick="setDownUp('up')">
+                    <svg height="80" width="80" stroke="rgb(255, 0, 255)"; xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="38" cy="38" r="30" class="shape" height="166" width="166"></circle>
+                        <div class="textCircleUp" id="upMax">up</div>
                     </svg>
                 </div>
+               
             </div>
         </div>
         <div class="tab-group control">           
@@ -165,6 +167,7 @@
                     if(direction=="down"){
                         down = !down
                         downBtn.classList.toggle("active2")
+                       
                     }else{
                         up=!up
                         upBtn.classList.toggle("active2")
@@ -218,7 +221,7 @@
 
             //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
-                console.log(arg)
+
                 if (arg.toString() == "Connection open.") {
                     connectionOpen=true
                     ctnBtn.style.display = 'none'
@@ -247,7 +250,7 @@
                 if(resultDown > maxDown){
                     maxDown=resultDown
                 }
-                downMaxHTML.innerHTML = maxDown
+                downMaxHTML.innerHTML = maxDown.toFixed(2)
             })
 
             //rezultati dobijeni od maina unutar koje imaintervalna petlja
@@ -257,7 +260,7 @@
                 if (resultUp > maxUp) {
                     maxUp = resultUp
                 }
-                upMaxHTML.innerHTML = maxUp
+                upMaxHTML.innerHTML = maxUp.toFixed(2)
             })
             
             //za dobijanje ssid name ali samo jednom tokomp prvog
