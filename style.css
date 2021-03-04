@@ -113,6 +113,10 @@ textarea::placeholder {
   border: 1px solid rgba(0, 0, 0, 0.01);
 }
 
+.active2 .icon-record {
+  color: rgb(228, 100, 37);
+}
+
 .window-content {
   overflow: hidden;
   display: flex;
@@ -138,7 +142,7 @@ textarea::placeholder {
   top: 50%;
   left: 0;
   width: 12rem;
-  background: rgb(228, 100, 37, 0.4);
+  background: rgb(26, 33, 34, 0.7);
   z-index: 10;
   transform: translateX(-12rem);
   transition: transform 0.5s;
@@ -146,7 +150,7 @@ textarea::placeholder {
   padding-right: 1rem;
 }
 .dialog p {
-  color: rgb(234, 235, 235);
+  color: tomato;
   font-size: 0.8rem;
   letter-spacing: 2px;
 }
@@ -252,4 +256,22 @@ textarea::placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/*for tooltips*/
+[data-tooltip]:before {
+  position: absolute;
+  top: -2rem;
+  padding: 0.5rem;
+  content: attr(data-tooltip);
+  opacity: 0;
+  background: rgb(26, 33, 34, 0.8);
+  color: rgb(228, 100, 37);
+  transition: opacity 0.4s ease-in-out;
+}
+[data-tooltip]:hover:before {
+  opacity: 1;
+}
+[data-tooltip]:not([data-tooltip-persistent]):before {
+  pointer-events: none;
 }

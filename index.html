@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>RGW Monitoring</title>
+    <title>RGW Traffic Monitoring</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link rel="stylesheet" href="./css/photon.css">
     <link rel="stylesheet" href="style.css">
@@ -67,21 +67,21 @@
                 <div class="svg-wrapper active2" id="up" onclick="setDownUp('up')">
                     <svg height="80" width="80" stroke="rgb(255, 0, 255)"; xmlns="http://www.w3.org/2000/svg">
                         <circle cx="38" cy="38" r="30" class="shape" height="166" width="166"></circle>
-                        <div class="textCircleUp" id="upMax">up</div>
+                        <div class="textCircleUp" id="upMax">Up</div>
                     </svg>
                 </div>
                
             </div>
         </div>
         <div class="tab-group control">           
-            <div class="tab-item active" id="stop" onclick="stopGraf()" >
+            <div class="tab-item active" id="stop" onclick="stopGraf()" data-tooltip="STOP GRAF">
                 <span class="icon icon-stop"></span>
                
             </div>
-            <div class="tab-item" id="start" onclick="startGraf()">
+            <div class="tab-item" id="start" onclick="startGraf()" data-tooltip="START GRAF">
                 <span class="icon icon-play"></span>
             </div>
-            <div class="tab-item" id="record">   
+            <div class="tab-item" id="record" onclick="recorder()" data-tooltip="GRAF RECORDING">   
                 <span class="icon icon-record"></span>
             </div>
         </div>
@@ -116,6 +116,7 @@
 
             var start = document.getElementById("start")
             var stop = document.getElementById("stop")
+            var record = document.getElementById("record")
 
             var downBtn = document.getElementById("down")
             var upBtn = document.getElementById("up")
@@ -207,18 +208,26 @@
             
             function stopGraf() {
                 
-                stop.classList.add("active")
-                start.classList.remove("active") 
-                maxDown = 0;
-                maxUp = 0
+                if(grafStarted){
+                    stop.classList.add("active")
+                    start.classList.remove("active")
+                    maxDown = 0;
+                    maxUp = 0
 
-                ssid.style.transform = "translateY(-50px)"
+                    ssid.style.transform = "translateY(-50px)"
 
-                grafStarted = false
+                    grafStarted = false
 
-                ipcRenderer.invoke('stopGraf') 
+                    ipcRenderer.invoke('stopGraf') 
+                }
+                
             }
 
+            function recorder(){
+                record.classList.toggle("active2") 
+            }
+            
+            
             //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
 
