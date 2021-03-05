@@ -130,11 +130,23 @@ textarea::placeholder {
   color: rgb(234, 235, 235);
   padding-left: 1rem;
 }
+.legend {
+  position: absolute;
+  left: 20%;
+  top: 1rem;
+  display: flex;
+}
+.legend p {
+  letter-spacing: 2px;
+  color: gray;
+}
 
-#down {
+#down,
+.legend .icon-down {
   color: lightgreen;
 }
-#up {
+#up,
+.legend .icon-up {
   color: rgb(255, 0, 255);
 }
 .dialog {
@@ -191,10 +203,11 @@ textarea::placeholder {
   right: 2rem;
 }
 .max {
-  color: rgb(234, 235, 235);
+  color: gray;
   position: absolute;
   letter-spacing: 2px;
-  left: 1rem;
+  font-size: 10px;
+  left: 0rem;
 }
 
 .svg-wrapper {

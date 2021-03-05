@@ -122,14 +122,20 @@ function startGraf(){
         stop.classList.remove("active") 
         grafStarted=true
         ipcRenderer.invoke('startGraf', choosenPort, down,up) 
+        showDialog("Graf Started.")
     } else {
         //elese pokazi dijalog
+        showDialog("Sorry. Connection is closed.")
+        
+    }
+}
+
+function showDialog(text){
+        myDialog.firstElementChild.innerHTML=text
         myDialog.style.transform = "translateX(1rem)"
         setTimeout(()=>{
             myDialog.style.transform= "translateX(-12rem)"
         }, 3000)
-    }
-    
 }
 
 function stopGraf() {
@@ -145,6 +151,7 @@ function stopGraf() {
         grafStarted = false
 
         ipcRenderer.invoke('stopGraf') 
+        showDialog("Graf Stoped.")
     }
     
 }

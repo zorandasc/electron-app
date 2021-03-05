@@ -7,9 +7,6 @@ var key= process.env.MY_SECRET_KEY;
 // Create an encryptor:
 var encryptor = require('simple-encryptor')(key);
 
-
-
-
 var win;
 var settingWin;
 
