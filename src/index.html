@@ -1,0 +1,97 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>RGW Traffic Monitoring</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="../css/photon.min.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body >
+    <div class="window">
+        <header class="toolbar toolbar-header">
+            
+            <div class="toolbar-actions">
+                <button class="btn btn-positive" onclick="connect()" id="cntBtn">Connect
+                </button>
+                <button class="btn btn-positive" onclick="disConnect()" id="discntBtn">DisConnect
+                </button>
+                
+                <textarea 
+                    class="form-control" 
+                    id="ta" name="ta" rows="3" cols="10"
+                    placeholder="Connection closed"
+                    readonly></textarea>
+            
+            </div>
+        </header>
+        <div class="tab-group">
+            <div class="tab-item active"  id="5" onclick="getPortid(5)">
+                <img class="img-circle media-object" src="../assets/wifiWhite.png" width="32" height="32">
+                <p>WiFi</p>
+            </div>
+            <div class="tab-item" id="1" onclick="getPortid(1)">
+                <img class="img-circle media-object" src="../assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 1</p>
+            </div>
+            <div class="tab-item" id="2" onclick="getPortid(2)">
+                <img class="img-circle media-object" src="../assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 2</p>
+            </div>
+            <div class="tab-item" id="3" onclick="getPortid(3)">
+                <img class="img-circle media-object" src="../assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 3</p>
+            </div>
+            <div class="tab-item" id="4" onclick="getPortid(4)">
+                <img class="img-circle media-object" src="../assets/etherWhite.png" width="32" height="32">
+                <p>Ethernet 4</p>
+            </div>
+           
+        </div>
+        
+        <div class="dialog" id="dialog">
+            <p>Sorry. Connection is closed.</p>
+        </div>
+        <div class="window-content"> 
+            <div id="ssid">
+            </div>
+            <canvas id="mycanvas"  width="600" height="250"></canvas>   
+            <div class="krugovi">
+                <p class="mjerna">[Mbit/s]</p>
+                <div class="svg-wrapper active2" id="down" onclick="setDownUp('down')">
+                    <svg height="80" width="80" stroke="lightgreen" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="38" cy="38" r="30" class="shape"  height="166" width="166"></circle>
+                        <div class="textCircleDown" id="downMax">Down</div>
+                    </svg>
+                </div>
+                <p class="max">Max:</p>
+                <div class="svg-wrapper active2" id="up" onclick="setDownUp('up')">
+                    <svg height="80" width="80" stroke="rgb(255, 0, 255)"; xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="38" cy="38" r="30" class="shape" height="166" width="166"></circle>
+                        <div class="textCircleUp" id="upMax">Up</div>
+                    </svg>
+                </div>
+               
+            </div>
+        </div>
+        <div class="tab-group control">           
+            <div class="tab-item active" id="stop" onclick="stopGraf()" data-tooltip="STOP GRAF">
+                <span class="icon icon-stop"></span>
+               
+            </div>
+            <div class="tab-item" id="start" onclick="startGraf()" data-tooltip="START GRAF">
+                <span class="icon icon-play"></span>
+            </div>
+            <div class="tab-item" id="startRec" onclick="startReco()" data-tooltip="START RECORDING">   
+                <span class="icon icon-record"></span>
+            </div>
+            <div class="tab-item active2" id="stopRec" onclick="stopReco()" data-tooltip="RECORDING">
+                <span class="icon icon-record"></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="smoothie.js"></script>
+    <script defer src="./index.js"></script>
+</body>
+
+</html>

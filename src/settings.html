@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="../css/photon.css">
+    <link rel="stylesheet" href="./settings.css">
+    <title>Connection Settings</title>
+</head>
+<body>
+    <form id="form" >
+        <div class="dialog" id="dialog">
+            <h3 >You have entered an invalid IP address!</h3>
+            <button type="button" onclick="closeDialog()" id="dialogBtn">X</button>
+        </div>
+        <div class="container">
+            <div class="form-group">
+                <label for="ip">IP Addresss</label>
+                <input type="text" id="ip" name="ip" autofocus >
+            </div>
+            <div class="form-group">
+                <label for="protocol">Protocol</label>
+                <select type="number" id="protocol" name="protocol" >
+                    <option value="23">Telnet</option>
+                    <option value="22">SSH</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="password" id="username" name="username"  >
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" autofocus >
+            </div>
+        </div>
+        <button type="button" onclick="clearFields()" class="btn  save clear">Clear</button>
+        <button type="submit" class="btn save">Save</button>
+        <p>*If the field is blank, the default will be used.</p>
+    </form>
+    <script defer src="./settings.js"></script>
+</body>
+</html>

@@ -58,7 +58,7 @@ function createWindow() {
     },
   });
 
-  win.loadFile("index.html");
+  win.loadFile("./src/index.html");
 
   win.on("closed", function () {
     app.quit();
@@ -99,7 +99,7 @@ function createSettingsWindow() {
   //set position of settwindow inside maniwindow
   settingWin.setPosition(position[0] + 100, position[1] + 100);
 
-  settingWin.loadFile("settings.html");
+  settingWin.loadFile("./src/settings.html");
 
   settingWin.once("ready-to-show", () => {
     settingWin.show();
@@ -117,6 +117,9 @@ const mainMenuTemplate = [
     click() {
       createSettingsWindow();
     },
+  },
+  {
+    type:'separator'
   },
   {
     label: "Quit",
