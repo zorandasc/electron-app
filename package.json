@@ -1,12 +1,10 @@
 {
-  "name": "rgw-traffic-monitor",
+  "name": "monitor",
   "version": "1.0.0",
   "description": "Monitoring App",
   "main": "main.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start": "electron ."
   },
   "keywords": [],
   "author": "Nazor Sicda",
@@ -18,7 +16,6 @@
     "custom-electron-titlebar": "^3.2.6",
     "dotenv": "^8.2.0",
     "electron-settings": "^4.0.2",
-    "electron-squirrel-startup": "^1.0.0",
     "simple-encryptor": "^4.0.0"
   }
 }
