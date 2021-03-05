@@ -9,7 +9,8 @@
 </head>
 <body >
     <div class="window">
-        <header class="toolbar toolbar-header">    
+        <header class="toolbar toolbar-header">
+            
             <div class="toolbar-actions">
                 <button class="btn btn-positive" onclick="connect()" id="cntBtn">Connect
                 </button>
@@ -81,7 +82,10 @@
             <div class="tab-item" id="start" onclick="startGraf()" data-tooltip="START GRAF">
                 <span class="icon icon-play"></span>
             </div>
-            <div class="tab-item" id="record" onclick="recorder()" data-tooltip="GRAF RECORDING">   
+            <div class="tab-item" id="startRec" onclick="startReco()" data-tooltip="START RECORDING">   
+                <span class="icon icon-record"></span>
+            </div>
+            <div class="tab-item active2" id="stopRec" onclick="stopReco()" data-tooltip="RECORDING">
                 <span class="icon icon-record"></span>
             </div>
         </div>
@@ -90,13 +94,25 @@
     
     <script type="text/javascript" src="smoothie.js"></script>
     <script defer>
-            const { ipcRenderer } = require('electron')
+            const { ipcRenderer, desktopCapturer, remote } = require('electron')
+            const { dialog } = remote;
+            const { writeFile } = require('fs');
             const customTitlebar = require('custom-electron-titlebar');
 
             var titleBar=new customTitlebar.Titlebar({
                 backgroundColor: customTitlebar.Color.fromHex('#e46425'),
                 overflow:'hidden'
             });
+
+            //browser build in mediarecorder, to record 
+            // MediaRecorder instance to capture footage
+            let mediaRecorder; 
+            let recordedChunks=[];
+            let stream;
+            let inputSources=[]
+            let buffer=[]
+           
+            
 
             var choosenPort =5;
             var down=true;
@@ -105,6 +121,7 @@
             var connectionOpen=false;
             var maxDown=0;
             var maxUp=0;
+           
 
             // Find the element
             var canvas = document.getElementById("mycanvas");
@@ -116,16 +133,19 @@
 
             var start = document.getElementById("start")
             var stop = document.getElementById("stop")
-            var record = document.getElementById("record")
+            var startRec = document.getElementById("startRec")
+            var stopRec = document.getElementById("stopRec")
 
             var downBtn = document.getElementById("down")
             var upBtn = document.getElementById("up")
 
-            var dialog = document.getElementById("dialog")
+            var myDialog = document.getElementById("dialog")
             var ssid = document.getElementById("ssid")
 
             var downMaxHTML=document.getElementById("downMax")
             var upMaxHTML = document.getElementById("upMax")
+
+            const videoElement = document.querySelector('video');
 
             // Create a time series
             var series1 = new TimeSeries();
@@ -147,6 +167,8 @@
 
             //chart.start();
             //chart.stop();
+
+           
 
             function getPortid(number){
                 
@@ -198,9 +220,9 @@
                     ipcRenderer.invoke('startGraf', choosenPort, down,up) 
                 } else {
                     //elese pokazi dijalog
-                    dialog.style.transform = "translateX(1rem)"
+                    myDialog.style.transform = "translateX(1rem)"
                     setTimeout(()=>{
-                        dialog.style.transform= "translateX(-12rem)"
+                        myDialog.style.transform= "translateX(-12rem)"
                     }, 3000)
                 }
                 
@@ -223,11 +245,92 @@
                 
             }
 
-            function recorder(){
-                record.classList.toggle("active2") 
+            getVideoSource()
+
+            function startReco(){
+
+                mediaRecorder.start();
+                startRec.style.display='none'
+                stopRec.style.display='flex'
+            }
+
+            function stopReco() {
+                
+                mediaRecorder.stop();
+
+                inputSources = []
+                recordedChunks=[]
+                buffer=[]
+
+                startRec.style.display = 'flex'
+                stopRec.style.display = 'none'                
+            }
+
+
+            async function getVideoSource(){
+                inputSources = await desktopCapturer.getSources({
+                    types: ['window', 'screen']
+                });
+                inputSources.map(source => {
+                    if(source.name ==="RGW Traffic Monitoring"){
+                        selectSource(source)
+                    }
+                })
+                
+               
+            }
+            // Change the videoSource window to record
+            async function selectSource(source){
+                const constraints = {
+                    audio: false,
+                    video: {
+                        mandatory: {
+                            chromeMediaSource: 'desktop',
+                            chromeMediaSourceId: source.id
+                        }
+                    }
+                };
+                // Create a Stream
+                stream = await navigator.mediaDevices
+                    .getUserMedia(constraints);
+
+                 // Create the Media Recorder
+                const options = { mimeType: 'video/webm; codecs=vp9' };
+                mediaRecorder = new MediaRecorder(stream, options);
+
+                // Register Event Handlers
+                mediaRecorder.ondataavailable = handleDataAvailable;
+                mediaRecorder.onstop = handleStop;
+            }
+                
+            
+
+            function handleDataAvailable(e){
+                console.log('video data available');
+                recordedChunks.push(e.data);      
+            }
+
+            async function handleStop(){
+                const blob = new Blob(recordedChunks, {
+                    type: 'video/webm; codecs=vp9'
+                });
+
+                buffer = Buffer.from(await blob.arrayBuffer());
+                
+                const { filePath } = await dialog.showSaveDialog({
+                    buttonLabel: 'Save video',
+                    defaultPath: `vid-${Date.now()}.webm`
+                });
+
+                if (filePath) {
+                    writeFile(filePath, buffer, () => console.log('video saved successfully!'));
+                }
             }
             
-            
+
+
+
+
             //status dobijen od mejna tokom i konektovanja
             ipcRenderer.on('connect-result', function (event, arg) {
 

@@ -257,6 +257,9 @@ textarea::placeholder {
   justify-content: center;
   align-items: center;
 }
+#stopRec {
+  display: none;
+}
 
 /*for tooltips*/
 [data-tooltip]:before {
@@ -274,4 +277,8 @@ textarea::placeholder {
 }
 [data-tooltip]:not([data-tooltip-persistent]):before {
   pointer-events: none;
+}
+
+#stopRec[data-tooltip]:before {
+  opacity: 1;
 }
