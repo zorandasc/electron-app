@@ -290,5 +290,5 @@ ipcRenderer.on('resultValUp', function (event, arg) {
 ipcRenderer.on('ssid', function (event, arg) {
     console.log(arg)
     ssid.innerHTML="SSID: " + arg
-    ssid.style.transform="translateY(0px)"
+    ssid.style.transform="translateY(4px)"
 })

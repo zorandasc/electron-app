@@ -37,8 +37,13 @@ div.smoothie-chart-tooltip {
   color: rgb(228, 100, 37);
   font-size: 20px;
   letter-spacing: 2px;
+
   box-shadow: 0 0 10px rgb(228, 100, 37);
   animation: glow 2s ease-in-out infinite alternate;
+}
+.toolbar-actions .form-control {
+  background-color: black;
+  text-align: center;
 }
 @keyframes glow {
   from {
@@ -132,8 +137,8 @@ textarea::placeholder {
 }
 .legend {
   position: absolute;
-  left: 20%;
-  top: 1rem;
+  left: 30%;
+  top: 0rem;
   display: flex;
 }
 .legend p {
@@ -151,7 +156,7 @@ textarea::placeholder {
 }
 .dialog {
   position: fixed;
-  top: 50%;
+  top: 60%;
   left: 0;
   width: 12rem;
   background: rgb(26, 33, 34, 0.7);
