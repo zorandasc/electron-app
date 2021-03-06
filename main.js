@@ -1,14 +1,13 @@
 const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 var net = require("net");
-const settings = require('electron-settings'); 
-require('dotenv').config();
+const settings = require("electron-settings");
+require("dotenv").config();
 const envVariables = require("./env-variables.json");
 
-const { username, password, mySecretKey} = envVariables;
-
+const { username, password, mySecretKey } = envVariables;
 
 // Create an encryptor:
-var encryptor = require('simple-encryptor')(mySecretKey);
+var encryptor = require("simple-encryptor")(mySecretKey);
 
 var win;
 var settingWin;
@@ -50,13 +49,12 @@ var wifiSelected;
 var firstReadDown = true;
 var firstReadUp = true;
 
-
 function createWindow() {
   win = new BrowserWindow({
     width: 720,
     height: 550,
-    frame:false,
-    titleBarStyle: "hidden", 
+    frame: false,
+    titleBarStyle: "hidden",
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -124,7 +122,7 @@ const mainMenuTemplate = [
     },
   },
   {
-    type:'separator'
+    type: "separator",
   },
   {
     label: "Quit",
@@ -180,37 +178,39 @@ var client = new net.Socket();
 
 client.setEncoding("utf8");
 
-
 // ... do actions on behalf of the Renderer
 ipcMain.handle("connect", (event, ...args) => {
-
   //first get the stored setting if it has any
-  settings.get('key').then(data => {
-    var {strIp,strProtocol,strUsername,strPassword}=data
+  settings.get("key").then((data) => {
+    var { strIp, strProtocol, strUsername, strPassword } = data;
 
-    var newIpAdress=strIp?strIp:defIpAdress
-    var newProtocol=strProtocol?strProtocol:defProtocol
-    var newUsername=strUsername?encryptor.decrypt(strUsername):defUsername
-    var newPassword=strPassword?encryptor.decrypt(strPassword):defPassword
+    var newIpAdress = strIp ? strIp : defIpAdress;
+    var newProtocol = strProtocol ? strProtocol : defProtocol;
+    var newUsername = strUsername
+      ? encryptor.decrypt(strUsername)
+      : defUsername;
+    var newPassword = strPassword
+      ? encryptor.decrypt(strPassword)
+      : defPassword;
 
     //console.log(newIpAdress,newProtocol,newUsername,newPassword )
 
-     //and then try to connect to client
+    //and then try to connect to client
     client.connect(newProtocol, newIpAdress, () => {
       client.write(`${newUsername}\r\n`);
       setTimeout(() => {
         client.write(`${newPassword}\r\n`);
         client.setTimeout(0);
       }, 2000);
-    }); 
-    
+    });
+
     //ovo je bitno ako je npr. pogrsna ip adrsesa
     if (client.connecting) {
       win.webContents.send("connect-result", "Conecting....");
       //setuj time out na 9 sekundi =>ovo  ce nas odvesti nakon 9s na ontimeuout listener
       client.setTimeout(9000);
     }
-  }) 
+  });
 });
 
 // ... do actions on behalf of the Renderer
@@ -375,6 +375,6 @@ function intervalPortStatistics(portNum) {
 function calculateBitRate(newBajt, oldBajt) {
   result = (newBajt - oldBajt) / timeInterval; //BAJTA/s
   result = result * 8; //bits/s
-  result = (result / 1000)/1000; //Mbits/s
+  result = result / 1000 / 1000; //Mbits/s
   return result;
 }
