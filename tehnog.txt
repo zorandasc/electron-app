@@ -1,0 +1,29 @@
+ELECTRON.JS
+https://www.electronjs.org/docs/tutorial/quick-start#package-and-distribute-the-application
+https://www.tutorialspoint.com/electron/electron_menus.htm
+https://github.com/electron/electron/tree/v11.2.3/docs#readme
+
+NODE.JS
+https://nodejs.org/api/net.html#net_event_end
+https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener
+
+SMOOTHIE.JS
+http://smoothiecharts.org/builder/
+
+PHOTON.JS
+http://photonkit.com/components/
+
+electron-settings package 
+https://www.geeksforgeeks.org/persisting-data-in-electronjs/
+
+
+electron-settings 
+This package allows us to persist user data and settings within the application 
+between reloads and application startups just like local storage. 
+All the data persisted using this package is stored onto a JSON file by 
+the name of settings.json located in the user’s local system 
+application directory.
+
+
+node-simple-encryptor
+https://github.com/sehrope/node-simple-encryptor

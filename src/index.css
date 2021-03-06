@@ -7,16 +7,6 @@
   font-size: 16px;
 }
 
-div.smoothie-chart-tooltip {
-  background: #444;
-  padding: 1em;
-  margin-top: 20px;
-  font-family: consolas;
-  color: rgb(234, 235, 235);
-  font-size: 14px;
-  pointer-events: none;
-}
-
 .toolbar {
   background: rgb(26, 33, 34);
 }
@@ -42,7 +32,7 @@ div.smoothie-chart-tooltip {
   letter-spacing: 2px;
 
   box-shadow: 0 0 10px rgb(228, 100, 37);
-  animation: glow 2s ease-in-out infinite alternate;
+  animation: glow 1s ease-in-out infinite alternate;
 }
 
 @keyframes glow {
@@ -74,6 +64,8 @@ textarea::placeholder {
 .form-group label {
   color: rgb(234, 235, 235);
 }
+/*-----------------------------------------------------------------------------*/
+/*INTERFACES*/
 .tab-group {
   border: none;
   min-height: 2.5rem;
@@ -122,6 +114,18 @@ textarea::placeholder {
 .active2 .icon-record {
   color: rgb(228, 100, 37);
 }
+/*-----------------------------------------------------------------------------*/
+/*WINDOW GRAF*/
+
+div.smoothie-chart-tooltip {
+  background: #444;
+  padding: 1em;
+  margin-top: 20px;
+  font-family: consolas;
+  color: rgb(234, 235, 235);
+  font-size: 14px;
+  pointer-events: none;
+}
 
 .window-content {
   overflow: hidden;
@@ -136,6 +140,8 @@ textarea::placeholder {
   color: rgb(234, 235, 235);
   padding-left: 1rem;
 }
+
+/*LEGENDA*/
 .legend {
   position: absolute;
   left: 30%;
@@ -143,18 +149,25 @@ textarea::placeholder {
   display: flex;
 }
 .legend p {
+  cursor: pointer;
   letter-spacing: 2px;
   color: gray;
 }
 
-#down,
 .legend .icon-down {
   color: lightgreen;
 }
-#up,
+
 .legend .icon-up {
   color: rgb(255, 0, 255);
 }
+/*ukljucimo iskljucimo down/up*/
+.icon-down.aco,
+.icon-up.aco {
+  color: #444;
+}
+
+/*DIALOG*/
 .dialog {
   position: fixed;
   top: 60%;
@@ -184,13 +197,6 @@ textarea::placeholder {
   transition: transform 0.5s;
   transform: translateY(-50px);
 }
-.max {
-  height: 250px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 
 .krugovi {
   position: relative;
@@ -208,6 +214,7 @@ textarea::placeholder {
   top: -1rem;
   right: 2rem;
 }
+/*MAX VALUES*/
 .max {
   color: gray;
   position: absolute;
@@ -224,11 +231,12 @@ textarea::placeholder {
   margin: 1rem 0;
   margin-left: 1rem;
 }
+
 .shape {
   border-radius: 100%;
   transition: stroke-width 1s, stroke-dashoffset 1s, stroke-dasharray 1s;
   border-radius: 100%;
-  animation: kurac 3s infinite;
+  animation: krug 3s infinite;
 }
 .textCircleDown,
 .textCircleUp {
@@ -249,7 +257,7 @@ textarea::placeholder {
   line-height: 80px;
 }
 
-@keyframes kurac {
+@keyframes krug {
   0% {
     stroke-width: 2px;
     stroke-dasharray: 0 540;
@@ -266,7 +274,8 @@ textarea::placeholder {
     stroke-dashoffset: 0;
   }
 }
-
+/*-----------------------------------------------------------------------------*/
+/*START STOP KONTROLA*/
 .control {
   height: 3rem;
 }
@@ -300,4 +309,9 @@ textarea::placeholder {
 
 #stopRec[data-tooltip]:before {
   opacity: 1;
+}
+
+.svg-wrapper[data-tooltip]:before {
+  top: 4rem;
+  left: 0.5rem;
 }

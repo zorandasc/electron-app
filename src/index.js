@@ -40,14 +40,16 @@ var stop = document.getElementById("stop")
 var startRec = document.getElementById("startRec")
 var stopRec = document.getElementById("stopRec")
 
+//ukljuci iskljuci down
 var downBtn = document.getElementById("down")
 var upBtn = document.getElementById("up")
 
 var myDialog = document.getElementById("dialog")
 var ssid = document.getElementById("ssid")
 
-var downMaxHTML=document.getElementById("downMax")
-var upMaxHTML = document.getElementById("upMax")
+//clear max values
+var downMax=document.getElementById("downMax")
+var upMax = document.getElementById("upMax")
 
 const videoElement = document.querySelector('video');
 
@@ -93,12 +95,21 @@ function setDownUp(direction){
     if(!grafStarted){
         if(direction=="down"){
             down = !down
-            downBtn.classList.toggle("active2")
-            
+            downBtn.firstElementChild.classList.toggle("aco")   
         }else{
             up=!up
-            upBtn.classList.toggle("active2")
+            upBtn.firstElementChild.classList.toggle("aco")
         } 
+    }
+}
+
+function clearMax(direction){
+    if(direction === "down"){
+        maxDown=0
+        downMax.innerHTML = maxDown.toFixed(2)
+    }else{
+        maxUp=0
+        upMax.innerHTML = maxUp.toFixed(2)
     }
 }
 
@@ -156,6 +167,8 @@ function stopGraf() {
     
 }
 
+//PRIPREMI SVE U STARTU, capture descop stream, 
+//create media recorder, creatae hendlers
 getVideoSource()
 
 function startReco(){
@@ -182,6 +195,7 @@ async function getVideoSource(){
     inputSources = await desktopCapturer.getSources({
         types: ['window', 'screen']
     });
+    //capture only this window
     inputSources.map(source => {
         if(source.name ==="RGW Traffic Monitoring"){
             selectSource(source)
@@ -273,7 +287,7 @@ ipcRenderer.on('resultValDown', function (event, arg) {
     if(resultDown > maxDown){
         maxDown=resultDown
     }
-    downMaxHTML.innerHTML = maxDown.toFixed(2)
+    downMax.innerHTML = maxDown.toFixed(2)
 })
 
 //rezultati dobijeni od maina unutar koje imaintervalna petlja
@@ -283,7 +297,7 @@ ipcRenderer.on('resultValUp', function (event, arg) {
     if (resultUp > maxUp) {
         maxUp = resultUp
     }
-    upMaxHTML.innerHTML = maxUp.toFixed(2)
+    upMax.innerHTML = maxUp.toFixed(2)
 })
 
 //za dobijanje ssid name ali samo jednom tokomp prvog

@@ -10,8 +10,10 @@ var encryptor = require('simple-encryptor')(key);
 var win;
 var settingWin;
 
+//first position of main window
 let position = [0, 0];
 
+//default telnets parameters
 var defIpAdress = "192.168.100.1";
 var defProtocol = "23";
 var defUsername = process.env.DEFUSERNAME;
@@ -19,8 +21,10 @@ var defPassword = process.env.DEFPASSWORD;
 
 var isConnected = false;
 
+//return from setInterval()
 var dataInterval;
 
+//disable/eneable direction up down
 var downDirection = true;
 var upDirection = true;
 
@@ -32,10 +36,11 @@ var newBajtUp;
 var resultBRDown;
 var resultBRUp;
 
+//string paterns for exstracting resulting bajts
 var transmitString;
 var receiveString;
 
-var timeInterval = 4;
+var timeInterval = 3;
 
 var wifiSelected;
 

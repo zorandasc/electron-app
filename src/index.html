@@ -56,22 +56,23 @@
             <div id="ssid">
             </div>
             <div class="legend">
-                <p>Downstream <span class="icon icon-down"></span></p>
-                <p>Upstream <span class="icon icon-up"></span></p>
+                <p onclick="setDownUp('down')" id="down">Downstream <span class="icon icon-down"></span></p>
+                <p onclick="setDownUp('up')" id="up">Upstream <span class="icon icon-up"></span></p>
             </div>
             <canvas id="mycanvas"  width="600" height="250"></canvas>   
             <div class="krugovi">
                 <p class="mjerna">[Mbit/s]</p>
-                <div class="svg-wrapper active2" id="down" onclick="setDownUp('down')">
+                <p class="max">Max Values.</p>
+                <div class="svg-wrapper"  onclick="clearMax('down')" data-tooltip="CLEAR">
                     <svg height="80" width="80" stroke="lightgreen" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="38" cy="38" r="30" class="shape"  height="166" width="166"></circle>
+                        <circle cx="38" cy="38" r="25" class="shape"  height="166" width="166"></circle>
                         <div class="textCircleDown" id="downMax">Down</div>
                     </svg>
                 </div>
-                <p class="max">Max Values.</p>
-                <div class="svg-wrapper active2" id="up" onclick="setDownUp('up')">
+                
+                <div class="svg-wrapper"  onclick="clearMax('up')" data-tooltip="CLEAR">
                     <svg height="80" width="80" stroke="rgb(255, 0, 255)"; xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="38" cy="38" r="30" class="shape" height="166" width="166"></circle>
+                        <circle cx="38" cy="38" r="25" class="shape" height="166" width="166"></circle>
                         <div class="textCircleUp" id="upMax">Up</div>
                     </svg>
                 </div>
