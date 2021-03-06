@@ -2,10 +2,13 @@ const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 var net = require("net");
 const settings = require('electron-settings'); 
 require('dotenv').config();
+const envVariables = require("./env-variables.json");
 
-var key= process.env.MY_SECRET_KEY;
+const { username, password, mySecretKey} = envVariables;
+
+
 // Create an encryptor:
-var encryptor = require('simple-encryptor')(key);
+var encryptor = require('simple-encryptor')(mySecretKey);
 
 var win;
 var settingWin;
@@ -16,8 +19,8 @@ let position = [0, 0];
 //default telnets parameters
 var defIpAdress = "192.168.100.1";
 var defProtocol = "23";
-var defUsername = process.env.DEFUSERNAME;
-var defPassword = process.env.DEFPASSWORD;
+var defUsername = username;
+var defPassword = password;
 
 var isConnected = false;
 
