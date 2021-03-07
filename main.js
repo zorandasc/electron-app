@@ -9,6 +9,8 @@ const { username, password, mySecretKey } = envVariables;
 // Create an encryptor:
 var encryptor = require("simple-encryptor")(mySecretKey);
 
+process.env.NODE_ENV = "production";
+
 var win;
 var settingWin;
 
