@@ -1,16 +1,29 @@
 {
-  "name": "monitor",
+  "name": "rgw-traffic-monitor",
   "version": "1.0.0",
-  "description": "Monitoring App",
+  "description": "Traffic Monitoring App",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+  "dist": "electron-builder"
   },
+  "build": {
+  "appId": "monitor.app",
+  "win": {
+    "target":"portable",
+    "icon" : "build/icon.ico"
+},
+  "mac": {
+    "category": "your.app.category.type"
+  }
+},
   "keywords": [],
   "author": "Nazor Sicda",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^11.2.3"
+    "electron": "^11.2.3",
+    "electron-builder": "^22.10.5"
   },
   "dependencies": {
     "custom-electron-titlebar": "^3.2.6",

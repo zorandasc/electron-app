@@ -27,3 +27,13 @@ application directory.
 
 node-simple-encryptor
 https://github.com/sehrope/node-simple-encryptor
+
+In THE END
+
+https://github.com/electron-userland/electron-builder
+
+PACKAGE.JSON
+"win": {
+    "target":"portable"
+},
+
